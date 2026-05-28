@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Daily Turkey Map Challenge</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        * { user-select: none; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #1a472a, #0e2a1a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .game {
+            background: #f5f2e8;
+            border-radius: 30px;
+            padding: 20px;
+            max-width: 1100px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .score-box {
+            background: #2c2b28;
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: #ffd966;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .target {
+            background: #3b2a1f;
+            padding: 10px 25px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3rem;
+        }
+        .city-name {
+            color: #ffaa33;
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+        .map-container { text-align: center; margin: 15px 0; }
+        canvas {
+            display: inline-block;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            cursor: crosshair;
+            background: #87CEEB;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #c9b27c;
+        }
+        .button-group { display: flex; gap: 15px; margin: 15px 0 10px 0; justify-content: center; flex-wrap: wrap; }
+        button {
+            background: #d9a13b;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            color: #2c2b28;
+            min-width: 160px;
+        }
+        button:active { transform: scale(0.97); }
+        #nextBtn { background: #2f6b3c; color: white; }
+        #resetBtn { background: #8b6c3c; color: white; }
+        #shareBtn { background: #25D366; color: white; min-width: 160px; display: none; }
+        .message {
+            padding: 12px;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .message-info { background: #e8e0c8; color: #2c2b28; border: 2px solid #c9b27c; }
+        .perfect { background: #a5d6a5; color: #1a472a; border: 2px solid #2f6b3c; }
+        .good { background: #c8e6c8; color: #1a472a; border: 2px solid #4a8c3a; }
+        .close { background: #ffe0b3; color: #5c3a1a; border: 2px solid #c9a13b; }
+        .far { background: #ffcc99; color: #5c3a1a; border: 2px solid #b87a2a; }
+        .miss { background: #ffb3b3; color: #8b0000; border: 2px solid #cc0000; }
+        .game-complete { background: #a5d6a5; color: #1a472a; border: 3px solid #2f6b3c; font-size: 1.3rem; }
+        .progress {
+            text-align: center;
+            font-size: 1rem;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2c2b28;
+            background: #ddd0a8;
+            padding: 8px;
+            border-radius: 30px;
+        }
+        .points-breakdown {
+            background: #2c2b28;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            color: #ffd966;
+            font-size: 0.85rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+        .points-breakdown span { color: white; }
+        .instruction { text-align: center; font-size: 0.9rem; color: #6b4c2c; margin-top: 5px; margin-bottom: 10px; }
+        .daily-badge {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #d9a13b;
+            margin-top: 5px;
+        }
+        
+        .daily-limit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .daily-limit-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .daily-limit-content {
+            background: #f5f2e8;
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .daily-limit-content h2 {
+            color: #8b3c2c;
+            margin: 0 0 15px 0;
+        }
+        .daily-limit-content p {
+            color: #2c2b28;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .daily-limit-content button {
+            background: #d9a13b;
+            margin-top: 10px;
+        }
+        @media (max-width: 700px) {
+            .city-name { font-size: 1.3rem; }
+            .target { font-size: 1rem; }
+            button { padding: 8px 16px; min-width: 120px; font-size: 0.9rem; }
+            .points-breakdown { font-size: 0.7rem; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game">
+    <div class="header">
+        <div class="score-box">🏆 SCORE: <span id="score">0</span> / 1000</div>
+        <div class="target">🎯 FIND: <span class="city-name" id="targetCity">Loading...</span></div>
+    </div>
+    
+    <div class="map-container">
+        <canvas id="turkeyCanvas" width="1024" height="500"></canvas>
+    </div>
+    
+    <div class="button-group">
+        <button id="resetBtn">🔄 PLAY AGAIN</button>
+        <button id="nextBtn">➡️ NEXT CITY</button>
+        <button id="shareBtn">📤 SHARE</button>
+    </div>
+    
+    <div class="instruction">📍 Click on the map where you think the city is located</div>
+    <div class="daily-badge" id="dailyBadge">🎯 Daily Challenge: Same cities for everyone today!</div>
+    
+    <div class="message message-info" id="message">Ready! Click on the map to start</div>
+    <div class="progress" id="progress">Question 1 of 5</div>
+    
+    <div class="points-breakdown">
+        <div>🎯 0-60km: <span>200 pts</span></div>
+        <div>👍 61-80km: <span>160 pts</span></div>
+        <div>✅ 81-100km: <span>120 pts</span></div>
+        <div>📌 101-150km: <span>80 pts</span></div>
+        <div>🔍 151-300km: <span>40 pts</span></div>
+        <div>❌ 300km+: <span>0 pts</span></div>
+    </div>
+</div>
+
+<div class="daily-limit-overlay" id="dailyLimitOverlay">
+    <div class="daily-limit-content">
+        <h2>⏰ Daily Challenge Complete!</h2>
+        <p>You've already played today's challenge.</p>
+        <p>Come back tomorrow for a new challenge!</p>
+        <p>⭐ Your score today: <span id="todaysScore">0</span> / 1000 ⭐</p>
+        <button id="closeDailyLimitBtn">OK</button>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('turkeyCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1024;
+    canvas.height = 500;
+    
+    const mapImage = new Image();
+    mapImage.src = 'turkey-map.png';
+    
+    const NORTH = 42.5;
+    const SOUTH = 35.5;
+    const WEST = 25.4;
+    const EAST = 45.0;
+    
+    const DAILY_KEY = 'turkey_map_daily_v2';
+    
+    function getDailySeed() {
+        const today = new Date();
+        return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    }
+    
+    function seededRandom(seed) {
+        let s = seed;
+        return function() {
+            s = (s * 1103515245 + 12345) & 0x7fffffff;
+            return s / 0x7fffffff;
+        };
+    }
+    
+    function seededShuffle(arr, seed) {
+        const rng = seededRandom(seed);
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(rng() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    
+    function latToY(lat) {
+        return ((NORTH - lat) / (NORTH - SOUTH)) * 500;
+    }
+    
+    function lonToX(lon) {
+        return ((lon - WEST) / (EAST - WEST)) * 1024;
+    }
+    
+    function pixelToLatLon(x, y) {
+        return {
+            lat: NORTH - (y / 500) * (NORTH - SOUTH),
+            lon: WEST + (x / 1024) * (EAST - WEST)
+        };
+    }
+    
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+    
+    const cities = [
+        { name: "Adana", lat: 36.9919, lon: 35.3308 }, { name: "Adıyaman", lat: 37.7636, lon: 38.2778 },
+        { name: "Afyonkarahisar", lat: 38.7584, lon: 30.5383 }, { name: "Ağrı", lat: 39.7195, lon: 43.0505 },
+        { name: "Aksaray", lat: 38.3747, lon: 34.0289 }, { name: "Amasya", lat: 40.6517, lon: 35.8336 },
+        { name: "Ankara", lat: 39.9208, lon: 32.8541 }, { name: "Antalya", lat: 36.8969, lon: 30.7133 },
+        { name: "Ardahan", lat: 41.1105, lon: 42.7022 }, { name: "Artvin", lat: 41.1825, lon: 41.8189 },
+        { name: "Aydın", lat: 37.8416, lon: 27.8456 }, { name: "Balıkesir", lat: 39.6484, lon: 27.8826 },
+        { name: "Bartın", lat: 41.6355, lon: 32.3362 }, { name: "Batman", lat: 37.8812, lon: 41.1351 },
+        { name: "Bayburt", lat: 40.2554, lon: 40.2231 }, { name: "Bilecik", lat: 40.1431, lon: 29.9794 },
+        { name: "Bingöl", lat: 38.8863, lon: 40.4987 }, { name: "Bitlis", lat: 38.4000, lon: 42.1083 },
+        { name: "Bolu", lat: 40.7356, lon: 31.6086 }, { name: "Burdur", lat: 37.7203, lon: 30.2908 },
+        { name: "Bursa", lat: 40.1826, lon: 29.0665 }, { name: "Çanakkale", lat: 40.1553, lon: 26.4142 },
+        { name: "Çankırı", lat: 40.6000, lon: 33.6167 }, { name: "Çorum", lat: 40.5455, lon: 34.9570 },
+        { name: "Denizli", lat: 37.7735, lon: 29.0865 }, { name: "Diyarbakır", lat: 37.9144, lon: 40.2306 },
+        { name: "Düzce", lat: 40.8389, lon: 31.1656 }, { name: "Edirne", lat: 41.6771, lon: 26.5557 },
+        { name: "Elazığ", lat: 38.6811, lon: 39.2256 }, { name: "Erzincan", lat: 39.7464, lon: 39.4925 },
+        { name: "Erzurum", lat: 39.9051, lon: 41.2709 }, { name: "Eskişehir", lat: 39.7700, lon: 30.5025 },
+        { name: "Gaziantep", lat: 37.0662, lon: 37.3833 }, { name: "Giresun", lat: 40.9128, lon: 38.3894 },
+        { name: "Gümüşhane", lat: 40.4603, lon: 39.4769 }, { name: "Hakkâri", lat: 37.5747, lon: 43.7408 },
+        { name: "Hatay", lat: 36.4018, lon: 36.3498 }, { name: "Iğdır", lat: 39.9200, lon: 44.0440 },
+        { name: "Isparta", lat: 37.7644, lon: 30.5564 }, { name: "İstanbul", lat: 41.0082, lon: 28.9784 },
+        { name: "İzmir", lat: 38.4189, lon: 27.1287 }, { name: "Kahramanmaraş", lat: 37.5875, lon: 36.9317 },
+        { name: "Karabük", lat: 41.2061, lon: 32.6194 }, { name: "Karaman", lat: 37.1811, lon: 33.2150 },
+        { name: "Kars", lat: 40.6017, lon: 43.0975 }, { name: "Kastamonu", lat: 41.3887, lon: 33.7825 },
+        { name: "Kayseri", lat: 38.7239, lon: 35.4801 }, { name: "Kırıkkale", lat: 39.8468, lon: 33.5153 },
+        { name: "Kırklareli", lat: 41.7358, lon: 27.2252 }, { name: "Kırşehir", lat: 39.1464, lon: 34.1597 },
+        { name: "Kilis", lat: 36.7167, lon: 37.1167 }, { name: "Kocaeli", lat: 40.7655, lon: 29.9408 },
+        { name: "Konya", lat: 37.8704, lon: 32.5110 }, { name: "Kütahya", lat: 39.4217, lon: 29.9879 },
+        { name: "Malatya", lat: 38.3552, lon: 38.3095 }, { name: "Manisa", lat: 38.6133, lon: 27.4250 },
+        { name: "Mardin", lat: 37.3132, lon: 40.7351 }, { name: "Mersin", lat: 36.8000, lon: 34.6333 },
+        { name: "Muğla", lat: 37.2153, lon: 28.3636 }, { name: "Muş", lat: 38.7347, lon: 41.4911 },
+        { name: "Nevşehir", lat: 38.6250, lon: 34.7167 }, { name: "Niğde", lat: 37.9667, lon: 34.6833 },
+        { name: "Ordu", lat: 40.9839, lon: 37.8764 }, { name: "Osmaniye", lat: 37.0750, lon: 36.2500 },
+        { name: "Rize", lat: 41.0208, lon: 40.5219 }, { name: "Sakarya", lat: 40.7732, lon: 30.3947 },
+        { name: "Samsun", lat: 41.2871, lon: 36.3234 }, { name: "Siirt", lat: 37.9311, lon: 41.9453 },
+        { name: "Sinop", lat: 42.0239, lon: 35.1531 }, { name: "Sivas", lat: 39.7515, lon: 37.0172 },
+        { name: "Şanlıurfa", lat: 37.1591, lon: 38.7969 }, { name: "Şırnak", lat: 37.5163, lon: 42.4610 },
+        { name: "Tekirdağ", lat: 40.9789, lon: 27.5106 }, { name: "Tokat", lat: 40.3139, lon: 36.5544 },
+        { name: "Trabzon", lat: 41.0061, lon: 39.7191 }, { name: "Tunceli", lat: 39.1075, lon: 39.5489 },
+        { name: "Uşak", lat: 38.6775, lon: 29.4058 }, { name: "Van", lat: 38.5012, lon: 43.3730 },
+        { name: "Yalova", lat: 40.6550, lon: 29.2775 }, { name: "Yozgat", lat: 39.8200, lon: 34.8094 },
+        { name: "Zonguldak", lat: 41.4564, lon: 31.7975 }
+    ];
+    
+    const citiesWithPos = cities.map(city => ({
+        name: city.name,
+        lat: city.lat,
+        lon: city.lon,
+        x: lonToX(city.lon),
+        y: latToY(city.lat)
+    }));
+    
+    let currentRound = [];
+    let currentIndex = 0;
+    let currentCity = null;
+    let totalScore = 0;
+    let canClick = true;
+    let mapLoaded = false;
+    let gameActive = true;
+    let answered = false;
+    let showMarkers = false;
+    let clickPos = null;
+    let correctPos = null;
+    
+    let questionPoints = [];
+    let questionIcons = [];
+    
+    function getDailyCities() {
+        const seed = getDailySeed();
+        const shuffled = seededShuffle([...citiesWithPos], seed);
+        return shuffled.slice(0, 5);
+    }
+    
+    function checkDailyLimit() {
+        const today = new Date().toDateString();
+        const saved = localStorage.getItem(DAILY_KEY);
+        if (saved) {
+            const data = JSON.parse(saved);
+            if (data.date === today) {
+                return { allowed: false, score: data.score };
+            }
+        }
+        return { allowed: true, score: null };
+    }
+    
+    function saveDailyScore(score) {
+        const today = new Date().toDateString();
+        localStorage.setItem(DAILY_KEY, JSON.stringify({ date: today, score: score }));
+    }
+    
+    function showDailyLimitOverlay(score) {
+        document.getElementById('todaysScore').innerText = score;
+        document.getElementById('dailyLimitOverlay').classList.add('show');
+    }
+    
+    function closeDailyLimitOverlay() {
+        document.getElementById('dailyLimitOverlay').classList.remove('show');
+    }
+    
+    let gameStarted = false;
+    const dailyCheck = checkDailyLimit();
+    
+    if (!dailyCheck.allowed) {
+        showDailyLimitOverlay(dailyCheck.score);
+        gameActive = false;
+        document.getElementById('nextBtn').style.display = "none";
+        document.getElementById('resetBtn').style.display = "none";
+        document.getElementById('shareBtn').style.display = "none";
+        document.getElementById('message').innerHTML = "⏰ You've already played today! Come back tomorrow.";
+        document.getElementById('message').className = "message miss";
+    } else {
+        gameStarted = true;
+        currentRound = getDailyCities();
+        const cityNames = currentRound.map(c => c.name).join(', ');
+        document.getElementById('dailyBadge').innerHTML = `🎯 Daily Challenge: ${cityNames}`;
+    }
+    
+    function drawMap() {
+        if (!mapLoaded) return;
+        ctx.clearRect(0, 0, 1024, 500);
+        ctx.drawImage(mapImage, 0, 0, 1024, 500);
+        
+        if (showMarkers) {
+            if (clickPos) {
+                ctx.beginPath();
+                ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = "white";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            if (correctPos) {
+                ctx.beginPath();
+                ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
+                ctx.fillStyle = "#33ff33";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                if (clickPos) {
+                    ctx.beginPath();
+                    ctx.moveTo(clickPos.x, clickPos.y);
+                    ctx.lineTo(correctPos.x, correctPos.y);
+                    ctx.strokeStyle = "#ffaa33";
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([8, 6]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+        }
+    }
+    
+    mapImage.onload = () => { mapLoaded = true; drawMap(); };
+    mapImage.onerror = () => { document.getElementById('message').innerHTML = "⚠️ Upload turkey-map.png"; };
+    
+    function calculatePoints(distanceKm) {
+        if (distanceKm <= 60) return 200;
+        if (distanceKm <= 80) return 160;
+        if (distanceKm <= 100) return 120;
+        if (distanceKm <= 150) return 80;
+        if (distanceKm <= 300) return 40;
+        return 0;
+    }
+    
+    function getIconForPoints(points) {
+        if (points >= 190) return "🏅";
+        if (points >= 160) return "🏆";
+        if (points >= 120) return "⭐";
+        if (points >= 80) return "👍";
+        return "💪";
+    }
+    
+    function getGradeText(distanceKm) {
+        if (distanceKm <= 60) return "🎯 PERFECT! +200";
+        if (distanceKm <= 80) return "👍 EXCELLENT! +160";
+        if (distanceKm <= 100) return "✅ VERY GOOD! +120";
+        if (distanceKm <= 150) return "📌 GOOD! +80";
+        if (distanceKm <= 300) return "🔍 NOT BAD +40";
+        return "❌ MISS +0";
+    }
+    
+    function getShareMessage() {
+        const now = new Date();
+        const month = now.toLocaleString('default', { month: 'short' });
+        const day = now.getDate();
+        const dateString = `${month} ${day}`;
+        let scoreLine = "";
+        for (let i = 0; i < questionPoints.length; i++) {
+            let icon = getIconForPoints(questionPoints[i]);
+            scoreLine += `${questionPoints[i]}${icon} `;
+        }
+        scoreLine = scoreLine.trim();
+        return `https://esa102.github.io/GameArcade/ ${dateString}\n${scoreLine}\nFinal score: ${totalScore}`;
+    }
+    
+    function shareScore() {
+        const message = getShareMessage();
+        
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                         || (navigator.maxTouchPoints > 0 && /Macintosh/.test(navigator.userAgent)); // Catches iPads pretending to be Macs
+    
+        // ONLY use navigator.share if it's explicitly a mobile device AND the API exists
+        if (isMobile && navigator.share) {
+            navigator.share({
+                title: 'My Turkey Map Challenge Score',
+                text: message,
+            }).catch(() => {
+                // Fallback to clipboard if native share fails or is cancelled
+                copyToClipboardFallback(message);
+            });
+        } else {
+            // Desktop environment - copy to clipboard ONLY
+            copyToClipboardFallback(message);
+        }
+    }
+    
+    // Cleaned up clipboard logic into a reusable helper function
+    function copyToClipboardFallback(message) {
+        navigator.clipboard.writeText(message).then(() => {
+            const msgDiv = document.getElementById('message');
+            if (!msgDiv) return;
+            
+            const originalText = msgDiv.innerHTML;
+            msgDiv.innerHTML = "📋 Score copied to clipboard!";
+            msgDiv.className = "message message-info";
+            
+            setTimeout(() => {
+                if (typeof gameActive !== 'undefined' && gameActive) {
+                    msgDiv.innerHTML = originalText;
+                } else {
+                    // Using totalScore safely if it's globally available
+                    const finalScore = typeof totalScore !== 'undefined' ? totalScore : 0;
+                    msgDiv.innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${finalScore} / 1000 ⭐`;
+                }
+            }, 2000);
+        }).catch((err) => {
+            console.error("Failed to copy text: ", err);
+        });
+    }
+    
+    function endGame() {
+        gameActive = false;
+        saveDailyScore(totalScore);
+        document.getElementById('message').className = "message game-complete";
+        document.getElementById('message').innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`;
+        document.getElementById('progress').innerHTML = "🏁 Come back tomorrow for a new challenge! 🏁";
+        document.getElementById('nextBtn').style.display = "none";
+        document.getElementById('shareBtn').style.display = "block";
+    }
+    
+    function loadNext() {
+        if (currentIndex >= currentRound.length) { endGame(); return; }
+        answered = false;
+        showMarkers = false;
+        clickPos = null;
+        correctPos = null;
+        currentCity = currentRound[currentIndex];
+        document.getElementById('targetCity').innerText = currentCity.name;
+        document.getElementById('progress').innerHTML = `📍 Question ${currentIndex + 1} of ${currentRound.length}`;
+        document.getElementById('message').className = "message message-info";
+        document.getElementById('message').innerHTML = "Click on the map!";
+        drawMap();
+        canClick = true;
+        document.getElementById('nextBtn').style.display = "block";
+        document.getElementById('shareBtn').style.display = "none";
+    }
+    
+    function handleClick(e) {
+        if (!gameActive || !canClick || !currentCity || !mapLoaded || answered) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = 1024 / rect.width;
+        const scaleY = 500 / rect.height;
+        const userX = (e.clientX - rect.left) * scaleX;
+        const userY = (e.clientY - rect.top) * scaleY;
+        
+        const clickLatLon = pixelToLatLon(userX, userY);
+        const distanceKm = haversineDistance(clickLatLon.lat, clickLatLon.lon, currentCity.lat, currentCity.lon);
+        const points = calculatePoints(distanceKm);
+        totalScore += points;
+        
+        questionPoints[currentIndex] = points;
+        questionIcons[currentIndex] = getIconForPoints(points);
+        
+        document.getElementById('score').innerText = totalScore;
+        
+        const msgDiv = document.getElementById('message');
+        let gradeClass = "miss";
+        if (distanceKm <= 60) gradeClass = "perfect";
+        else if (distanceKm <= 100) gradeClass = "good";
+        else if (distanceKm <= 300) gradeClass = "close";
+        msgDiv.className = `message ${gradeClass}`;
+        msgDiv.innerHTML = `${getGradeText(distanceKm)}`;
+        
+        showMarkers = true;
+        clickPos = { x: userX, y: userY };
+        correctPos = { x: currentCity.x, y: currentCity.y };
+        drawMap();
+        answered = true;
+        canClick = false;
+    }
+    
+    function nextCity() {
+        if (!gameActive) return;
+        if (!answered) {
+            document.getElementById('message').innerHTML = "⚠️ Click on the map first!";
+            return;
+        }
+        currentIndex++;
+        loadNext();
+    }
+    
+    function resetGame() {
+        if (!gameStarted || !gameActive) {
+            document.getElementById('message').innerHTML = "⏰ You can only play once per day!";
+        }
+    }
+    
+    if (gameStarted) { loadNext(); }
+    
+    canvas.addEventListener('click', handleClick);
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
+    document.getElementById('nextBtn').addEventListener('click', nextCity);
+    document.getElementById('shareBtn').addEventListener('click', shareScore);
+    document.getElementById('closeDailyLimitBtn').addEventListener('click', closeDailyLimitOverlay);
+</script>
+</body>
+</html>
