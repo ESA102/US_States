@@ -20,7 +20,7 @@
             background: #f5f2e8;
             border-radius: 30px;
             padding: 20px;
-            max-width: 1100px;
+            max-width: 1200px;
             width: 100%;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
@@ -47,54 +47,25 @@
             color: white;
             font-size: 1.3rem;
         }
-        .state-name {
-            color: #ffaa33;
-            font-weight: bold;
-            font-size: 1.8rem;
-        }
-        .map-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1024 / 500;
-            background: #87CEEB;
+        .state-name { color: #ffaa33; font-weight: bold; font-size: 1.8rem; }
+        .map-container { text-align: center; margin: 15px 0; }
+        canvas { 
+            display: inline-block;
             border-radius: 20px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             cursor: crosshair;
-            border-radius: 20px;
+            background: #c9b27c;
+            width: 100%;
+            height: auto;
+            border: 2px solid #c9b27c;
         }
         .button-group { display: flex; gap: 15px; margin: 15px 0 10px 0; justify-content: center; flex-wrap: wrap; }
-        button {
-            background: #d9a13b;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            color: #2c2b28;
-            min-width: 160px;
-        }
+        button { background: #d9a13b; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 50px; cursor: pointer; color: #2c2b28; min-width: 160px; }
         button:active { transform: scale(0.97); }
         #nextBtn { background: #2f6b3c; color: white; }
         #resetBtn { background: #8b6c3c; color: white; }
         #shareBtn { background: #25D366; color: white; min-width: 160px; display: none; }
-        .message {
-            padding: 12px;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 1.1rem;
-            margin: 10px 0;
-            font-weight: bold;
-        }
+        .message { padding: 12px; border-radius: 50px; text-align: center; font-size: 1.1rem; margin: 10px 0; font-weight: bold; }
         .message-info { background: #e8e0c8; color: #2c2b28; border: 2px solid #c9b27c; }
         .perfect { background: #a5d6a5; color: #1a472a; border: 2px solid #2f6b3c; }
         .good { background: #c8e6c8; color: #1a472a; border: 2px solid #4a8c3a; }
@@ -102,41 +73,18 @@
         .far { background: #ffcc99; color: #5c3a1a; border: 2px solid #b87a2a; }
         .miss { background: #ffb3b3; color: #8b0000; border: 2px solid #cc0000; }
         .game-complete { background: #a5d6a5; color: #1a472a; border: 3px solid #2f6b3c; font-size: 1.3rem; }
-        .progress {
-            text-align: center;
-            font-size: 1rem;
-            margin-top: 10px;
-            font-weight: bold;
-            color: #2c2b28;
-            background: #ddd0a8;
-            padding: 8px;
-            border-radius: 30px;
-        }
-        .points-breakdown {
-            background: #2c2b28;
-            border-radius: 20px;
-            padding: 10px 15px;
-            margin-top: 10px;
-            color: #ffd966;
-            font-size: 0.85rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
+        .progress { text-align: center; font-size: 1rem; margin-top: 10px; font-weight: bold; color: #2c2b28; background: #ddd0a8; padding: 8px; border-radius: 30px; }
+        .points-breakdown { background: #2c2b28; border-radius: 20px; padding: 10px 15px; margin-top: 10px; color: #ffd966; font-size: 0.85rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
         .points-breakdown span { color: white; }
         .instruction { text-align: center; font-size: 0.9rem; color: #6b4c2c; margin-top: 5px; margin-bottom: 10px; }
-        .daily-badge {
-            text-align: center;
-            font-size: 0.8rem;
-            color: #d9a13b;
-            margin-top: 5px;
-        }
-        @media (max-width: 700px) {
-            .state-name { font-size: 1.3rem; }
-            .target { font-size: 1rem; }
-            button { padding: 8px 16px; min-width: 120px; font-size: 0.9rem; }
-        }
+        .daily-badge { text-align: center; font-size: 0.8rem; color: #d9a13b; margin-top: 5px; }
+        .daily-limit-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: all 0.3s ease; }
+        .daily-limit-overlay.show { visibility: visible; opacity: 1; }
+        .daily-limit-content { background: #f5f2e8; border-radius: 30px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+        .daily-limit-content h2 { color: #8b3c2c; margin: 0 0 15px 0; }
+        .daily-limit-content p { color: #2c2b28; margin-bottom: 20px; }
+        .daily-limit-content button { background: #d9a13b; margin-top: 10px; }
+        @media (max-width: 700px) { .state-name { font-size: 1.3rem; } .target { font-size: 1rem; } button { padding: 8px 16px; min-width: 120px; font-size: 0.9rem; } }
     </style>
 </head>
 <body>
@@ -145,306 +93,148 @@
         <div class="score-box">🏆 SCORE: <span id="score">0</span> / 1000</div>
         <div class="target">🇺🇸 FIND: <span class="state-name" id="targetCity">Loading...</span></div>
     </div>
-    
-    <div class="map-container">
-        <canvas id="usCanvas"></canvas>
-    </div>
-    
-    <div class="button-group">
-        <button id="resetBtn">🔄 PLAY AGAIN</button>
-        <button id="nextBtn">➡️ NEXT STATE</button>
-        <button id="shareBtn">📤 SHARE</button>
-    </div>
-    
+    <div class="map-container"><canvas id="usCanvas"></canvas></div>
+    <div class="button-group"><button id="resetBtn">🔄 PLAY AGAIN</button><button id="nextBtn">➡️ NEXT STATE</button><button id="shareBtn">📤 SHARE</button></div>
     <div class="instruction">📍 Click on the map where you think the state is located</div>
     <div class="daily-badge" id="dailyBadge">🎯 Daily Challenge: Same states for everyone today!</div>
-    
     <div class="message message-info" id="message">Ready! Click on the map to start</div>
     <div class="progress" id="progress">Question 1 of 5</div>
-    
-    <div class="points-breakdown">
-        <div>🎯 0-80km: <span>200 pts</span></div>
-        <div>👍 81-120km: <span>160 pts</span></div>
-        <div>✅ 121-180km: <span>120 pts</span></div>
-        <div>📌 181-250km: <span>80 pts</span></div>
-        <div>🔍 251-350km: <span>40 pts</span></div>
-        <div>❌ 350km+: <span>0 pts</span></div>
-    </div>
+    <div class="points-breakdown"><div>🎯 0-80km: <span>200 pts</span></div><div>👍 81-120km: <span>160 pts</span></div><div>✅ 121-180km: <span>120 pts</span></div><div>📌 181-250km: <span>80 pts</span></div><div>🔍 251-350km: <span>40 pts</span></div><div>❌ 350km+: <span>0 pts</span></div></div>
 </div>
+<div class="daily-limit-overlay" id="dailyLimitOverlay"><div class="daily-limit-content"><h2>⏰ Daily Challenge Complete!</h2><p>You've already played today's challenge.</p><p>Come back tomorrow for a new challenge!</p><p>⭐ Your score today: <span id="todaysScore">0</span> / 1000 ⭐</p><button id="closeDailyLimitBtn">OK</button></div></div>
 
 <script>
     const canvas = document.getElementById('usCanvas');
     const ctx = canvas.getContext('2d');
-    
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
     
-    // State coordinates (standard US geographic centers)
-    const statesData = [
-        { name: "Alabama", x: 490, y: 340 },
-        { name: "Alaska", x: 100, y: 120 },
-        { name: "Arizona", x: 370, y: 370 },
-        { name: "Arkansas", x: 460, y: 365 },
-        { name: "California", x: 280, y: 360 },
-        { name: "Colorado", x: 420, y: 310 },
-        { name: "Connecticut", x: 710, y: 180 },
-        { name: "Delaware", x: 680, y: 210 },
-        { name: "Florida", x: 580, y: 410 },
-        { name: "Georgia", x: 560, y: 350 },
-        { name: "Hawaii", x: 180, y: 470 },
-        { name: "Idaho", x: 350, y: 220 },
-        { name: "Illinois", x: 510, y: 280 },
-        { name: "Indiana", x: 530, y: 285 },
-        { name: "Iowa", x: 490, y: 255 },
-        { name: "Kansas", x: 440, y: 320 },
-        { name: "Kentucky", x: 540, y: 310 },
-        { name: "Louisiana", x: 460, y: 395 },
-        { name: "Maine", x: 790, y: 140 },
-        { name: "Maryland", x: 650, y: 230 },
-        { name: "Massachusetts", x: 730, y: 175 },
-        { name: "Michigan", x: 540, y: 210 },
-        { name: "Minnesota", x: 480, y: 190 },
-        { name: "Mississippi", x: 510, y: 365 },
-        { name: "Missouri", x: 490, y: 300 },
-        { name: "Montana", x: 390, y: 185 },
-        { name: "Nebraska", x: 450, y: 270 },
-        { name: "Nevada", x: 320, y: 300 },
-        { name: "New Hampshire", x: 740, y: 160 },
-        { name: "New Jersey", x: 690, y: 200 },
-        { name: "New Mexico", x: 400, y: 370 },
-        { name: "New York", x: 660, y: 195 },
-        { name: "North Carolina", x: 620, y: 315 },
-        { name: "North Dakota", x: 440, y: 170 },
-        { name: "Ohio", x: 570, y: 265 },
-        { name: "Oklahoma", x: 440, y: 355 },
-        { name: "Oregon", x: 280, y: 240 },
-        { name: "Pennsylvania", x: 620, y: 240 },
-        { name: "Rhode Island", x: 740, y: 190 },
-        { name: "South Carolina", x: 610, y: 345 },
-        { name: "South Dakota", x: 440, y: 230 },
-        { name: "Tennessee", x: 540, y: 335 },
-        { name: "Texas", x: 440, y: 400 },
-        { name: "Utah", x: 370, y: 310 },
-        { name: "Vermont", x: 710, y: 150 },
-        { name: "Virginia", x: 620, y: 290 },
-        { name: "Washington", x: 270, y: 210 },
-        { name: "West Virginia", x: 590, y: 305 },
-        { name: "Wisconsin", x: 510, y: 225 },
-        { name: "Wyoming", x: 410, y: 260 }
+    // Standard US bounds for a typical US map
+    const NORTH = 49.5;
+    const SOUTH = 24.5;
+    const WEST = -125.0;
+    const EAST = -66.0;
+    
+    function latToY(lat) {
+        return ((NORTH - lat) / (NORTH - SOUTH)) * mapImage.height;
+    }
+    
+    function lonToX(lon) {
+        return ((lon - WEST) / (EAST - WEST)) * mapImage.width;
+    }
+    
+    // All 50 states with actual geographic coordinates
+    const statesGeo = [
+        { name: "Alabama", lat: 32.8065, lon: -86.7911 },
+        { name: "Alaska", lat: 61.3707, lon: -152.4044 },
+        { name: "Arizona", lat: 34.2744, lon: -111.6602 },
+        { name: "Arkansas", lat: 34.9697, lon: -92.3731 },
+        { name: "California", lat: 36.7783, lon: -119.4179 },
+        { name: "Colorado", lat: 39.0598, lon: -105.3111 },
+        { name: "Connecticut", lat: 41.6032, lon: -72.0877 },
+        { name: "Delaware", lat: 38.9108, lon: -75.5277 },
+        { name: "Florida", lat: 27.9944, lon: -81.7603 },
+        { name: "Georgia", lat: 32.6415, lon: -83.4426 },
+        { name: "Hawaii", lat: 20.2927, lon: -156.3737 },
+        { name: "Idaho", lat: 44.2405, lon: -114.4788 },
+        { name: "Illinois", lat: 40.3495, lon: -88.9861 },
+        { name: "Indiana", lat: 39.8942, lon: -86.2816 },
+        { name: "Iowa", lat: 41.8780, lon: -93.0977 },
+        { name: "Kansas", lat: 38.5266, lon: -96.7265 },
+        { name: "Kentucky", lat: 37.6681, lon: -84.6701 },
+        { name: "Louisiana", lat: 30.3918, lon: -92.3291 },
+        { name: "Maine", lat: 44.6939, lon: -69.3819 },
+        { name: "Maryland", lat: 39.0639, lon: -76.8021 },
+        { name: "Massachusetts", lat: 42.2302, lon: -71.5301 },
+        { name: "Michigan", lat: 43.3265, lon: -84.5361 },
+        { name: "Minnesota", lat: 46.3925, lon: -94.6362 },
+        { name: "Mississippi", lat: 32.7416, lon: -89.6787 },
+        { name: "Missouri", lat: 38.4561, lon: -92.2884 },
+        { name: "Montana", lat: 46.9219, lon: -110.4544 },
+        { name: "Nebraska", lat: 41.1254, lon: -98.2681 },
+        { name: "Nevada", lat: 38.3135, lon: -117.0554 },
+        { name: "New Hampshire", lat: 43.4525, lon: -71.5639 },
+        { name: "New Jersey", lat: 40.2989, lon: -74.5210 },
+        { name: "New Mexico", lat: 34.8405, lon: -106.2485 },
+        { name: "New York", lat: 42.7654, lon: -74.9105 },
+        { name: "North Carolina", lat: 35.5557, lon: -79.3878 },
+        { name: "North Dakota", lat: 47.5289, lon: -99.7840 },
+        { name: "Ohio", lat: 40.3888, lon: -82.7649 },
+        { name: "Oklahoma", lat: 35.5653, lon: -96.9289 },
+        { name: "Oregon", lat: 44.5725, lon: -122.0709 },
+        { name: "Pennsylvania", lat: 40.8781, lon: -77.7996 },
+        { name: "Rhode Island", lat: 41.6762, lon: -71.5562 },
+        { name: "South Carolina", lat: 33.8569, lon: -80.9450 },
+        { name: "South Dakota", lat: 44.2998, lon: -99.4388 },
+        { name: "Tennessee", lat: 35.7478, lon: -86.6923 },
+        { name: "Texas", lat: 31.0545, lon: -97.5635 },
+        { name: "Utah", lat: 39.3056, lon: -111.6703 },
+        { name: "Vermont", lat: 43.8710, lon: -72.6327 },
+        { name: "Virginia", lat: 37.7693, lon: -78.1697 },
+        { name: "Washington", lat: 47.4009, lon: -121.4905 },
+        { name: "West Virginia", lat: 38.4912, lon: -80.9545 },
+        { name: "Wisconsin", lat: 44.7866, lon: -89.4134 },
+        { name: "Wyoming", lat: 42.9966, lon: -107.5526 }
     ];
     
-    let currentRound = [];
-    let currentIndex = 0;
-    let currentState = null;
-    let totalScore = 0;
-    let canClick = true;
-    let mapLoaded = false;
-    let gameActive = true;
-    let answered = false;
-    let showMarkers = false;
-    let clickPos = null;
-    let correctPos = null;
-    let questionPoints = [];
-    let questionIcons = [];
-    let gameStarted = false;
+    let statesData = [];
+    let currentRound = [], currentIndex = 0, currentState = null, totalScore = 0, canClick = true, mapLoaded = false, gameActive = true, answered = false, showMarkers = false, clickPos = null, correctPos = null, questionPoints = [], questionIcons = [], gameStarted = false;
     
-    let canvasDisplayWidth = 0;
-    let canvasDisplayHeight = 0;
-    let scaleX = 1;
-    let scaleY = 1;
-    
-    function getDailySeed() {
-        const today = new Date();
-        return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-    }
-    
-    function seededRandom(seed) {
-        let s = seed;
-        return function() {
-            s = (s * 1103515245 + 12345) & 0x7fffffff;
-            return s / 0x7fffffff;
-        };
-    }
-    
-    function seededShuffle(arr, seed) {
-        const rng = seededRandom(seed);
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(rng() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-    }
-    
-    function getDailyStates() {
-        const seed = getDailySeed();
-        const shuffled = seededShuffle([...statesData], seed);
-        return shuffled.slice(0, 5);
-    }
+    function getDailySeed() { const today = new Date(); return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate(); }
+    function seededRandom(seed) { let s = seed; return function() { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }; }
+    function seededShuffle(arr, seed) { const rng = seededRandom(seed); for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+    function getDailyStates() { const seed = getDailySeed(); const shuffled = seededShuffle([...statesData], seed); return shuffled.slice(0, 5); }
     
     function drawMap() {
         if (!mapLoaded) return;
-        
-        const container = canvas.parentElement;
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        
-        canvas.width = mapImage.width;
-        canvas.height = mapImage.height;
-        
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        canvas.style.objectFit = 'contain';
-        
-        scaleX = canvas.width / containerWidth;
-        scaleY = canvas.height / containerHeight;
-        
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
-        
         if (showMarkers) {
-            if (clickPos) {
-                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
-                ctx.fillStyle = "white"; ctx.fill();
-                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
-                ctx.strokeStyle = "black"; ctx.lineWidth = 2; ctx.stroke();
-            }
-            if (correctPos) {
-                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
-                ctx.fillStyle = "#33ff33"; ctx.fill();
-                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
-                ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
-                if (clickPos) {
-                    ctx.beginPath(); ctx.moveTo(clickPos.x, clickPos.y); ctx.lineTo(correctPos.x, correctPos.y);
-                    ctx.strokeStyle = "#ffaa33"; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); ctx.stroke(); ctx.setLineDash([]);
-                }
-            }
+            if (clickPos) { ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2); ctx.fillStyle = "white"; ctx.fill(); ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2); ctx.strokeStyle = "black"; ctx.lineWidth = 2; ctx.stroke(); }
+            if (correctPos) { ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2); ctx.fillStyle = "#33ff33"; ctx.fill(); ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2); ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke(); if (clickPos) { ctx.beginPath(); ctx.moveTo(clickPos.x, clickPos.y); ctx.lineTo(correctPos.x, correctPos.y); ctx.strokeStyle = "#ffaa33"; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); ctx.stroke(); ctx.setLineDash([]); } }
         }
     }
     
-    mapImage.onload = () => {
-        mapLoaded = true;
-        drawMap();
-        window.addEventListener('resize', () => drawMap());
+    mapImage.onload = () => { 
+        canvas.width = mapImage.width;
+        canvas.height = mapImage.height;
+        // Calculate positions AFTER image loads so dimensions are correct
+        statesData = statesGeo.map(state => ({
+            name: state.name,
+            x: lonToX(state.lon),
+            y: latToY(state.lat)
+        }));
+        mapLoaded = true; 
+        drawMap(); 
+        initGame();
     };
+    mapImage.onerror = () => { document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png"; };
     
-    mapImage.onerror = () => {
-        document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png";
-    };
+    function haversineDistance(clickX, clickY, correctX, correctY) { const dx = clickX - correctX; const dy = clickY - correctY; const pixelDist = Math.sqrt(dx*dx + dy*dy); return pixelDist * 4.0; }
+    function calculatePoints(distanceKm) { if (distanceKm <= 80) return 200; if (distanceKm <= 120) return 160; if (distanceKm <= 180) return 120; if (distanceKm <= 250) return 80; if (distanceKm <= 350) return 40; return 0; }
+    function getGradeText(distanceKm) { if (distanceKm <= 80) return "🎯 PERFECT! +200"; if (distanceKm <= 120) return "👍 EXCELLENT! +160"; if (distanceKm <= 180) return "✅ VERY GOOD! +120"; if (distanceKm <= 250) return "📌 GOOD! +80"; if (distanceKm <= 350) return "🔍 NOT BAD +40"; return "❌ MISS +0"; }
+    function getIconForPoints(points) { if (points >= 190) return "🏅"; if (points >= 160) return "🏆"; if (points >= 120) return "⭐"; if (points >= 80) return "👍"; return "💪"; }
+    function getShareMessage() { const now = new Date(); const month = now.toLocaleString('default', { month: 'short' }); const day = now.getDate(); const dateString = `${month} ${day}`; let scoreLine = ""; for (let i = 0; i < questionPoints.length; i++) { let icon = getIconForPoints(questionPoints[i]); scoreLine += `${questionPoints[i]}${icon} `; } scoreLine = scoreLine.trim(); return `https://ESA102.github.io/GameArcade/ ${dateString}\n${scoreLine}\nFinal score: ${totalScore}`; }
     
-    function haversineDistance(clickX, clickY, correctX, correctY) {
-        const dx = clickX - correctX;
-        const dy = clickY - correctY;
-        const pixelDist = Math.sqrt(dx*dx + dy*dy);
-        return pixelDist * 4.5;
-    }
+    function shareScore() { const message = getShareMessage(); const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && /Macintosh/.test(navigator.userAgent)); if (isMobile && navigator.share) { navigator.share({ title: 'My US States Challenge Score', text: message }).catch(() => { copyToClipboardFallback(message); }); } else { copyToClipboardFallback(message); } }
+    function copyToClipboardFallback(message) { navigator.clipboard.writeText(message).then(() => { const msgDiv = document.getElementById('message'); if (!msgDiv) return; const originalText = msgDiv.innerHTML; msgDiv.innerHTML = "📋 Score copied to clipboard!"; msgDiv.className = "message message-info"; setTimeout(() => { if (gameActive) { msgDiv.innerHTML = originalText; } else { msgDiv.innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`; } }, 2000); }).catch(() => {}); }
     
-    function calculatePoints(distanceKm) {
-        if (distanceKm <= 80) return 200;
-        if (distanceKm <= 120) return 160;
-        if (distanceKm <= 180) return 120;
-        if (distanceKm <= 250) return 80;
-        if (distanceKm <= 350) return 40;
-        return 0;
-    }
-    
-    function getGradeText(distanceKm) {
-        if (distanceKm <= 80) return "🎯 PERFECT! +200";
-        if (distanceKm <= 120) return "👍 EXCELLENT! +160";
-        if (distanceKm <= 180) return "✅ VERY GOOD! +120";
-        if (distanceKm <= 250) return "📌 GOOD! +80";
-        if (distanceKm <= 350) return "🔍 NOT BAD +40";
-        return "❌ MISS +0";
-    }
-    
-    function getIconForPoints(points) {
-        if (points >= 190) return "🏅";
-        if (points >= 160) return "🏆";
-        if (points >= 120) return "⭐";
-        if (points >= 80) return "👍";
-        return "💪";
-    }
-    
-    function getShareMessage() {
-        const now = new Date();
-        const month = now.toLocaleString('default', { month: 'short' });
-        const day = now.getDate();
-        const dateString = `${month} ${day}`;
-        let scoreLine = "";
-        for (let i = 0; i < questionPoints.length; i++) {
-            let icon = getIconForPoints(questionPoints[i]);
-            scoreLine += `${questionPoints[i]}${icon} `;
-        }
-        scoreLine = scoreLine.trim();
-        return `https://ESA102.github.io/GameArcade/ ${dateString}\n${scoreLine}\nFinal score: ${totalScore}`;
-    }
-    
-    function shareScore() {
-        const message = getShareMessage();
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                         || (navigator.maxTouchPoints > 0 && /Macintosh/.test(navigator.userAgent));
-        if (isMobile && navigator.share) {
-            navigator.share({ title: 'My US States Challenge Score', text: message }).catch(() => { copyToClipboardFallback(message); });
-        } else {
-            copyToClipboardFallback(message);
-        }
-    }
-    
-    function copyToClipboardFallback(message) {
-        navigator.clipboard.writeText(message).then(() => {
-            const msgDiv = document.getElementById('message');
-            if (!msgDiv) return;
-            const originalText = msgDiv.innerHTML;
-            msgDiv.innerHTML = "📋 Score copied to clipboard!";
-            msgDiv.className = "message message-info";
-            setTimeout(() => {
-                if (gameActive) { msgDiv.innerHTML = originalText; }
-                else { msgDiv.innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`; }
-            }, 2000);
-        }).catch(() => {});
-    }
-    
-    function endGame() {
-        gameActive = false;
-        document.getElementById('message').className = "message game-complete";
-        document.getElementById('message').innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`;
-        document.getElementById('progress').innerHTML = "🏁 Come back tomorrow for a new challenge! 🏁";
-        document.getElementById('nextBtn').style.display = "none";
-        document.getElementById('shareBtn').style.display = "block";
-    }
-    
-    function loadNext() {
-        if (currentIndex >= currentRound.length) { endGame(); return; }
-        answered = false;
-        showMarkers = false;
-        clickPos = null;
-        correctPos = null;
-        currentState = currentRound[currentIndex];
-        document.getElementById('targetCity').innerText = currentState.name;
-        document.getElementById('progress').innerHTML = `📍 Question ${currentIndex + 1} of ${currentRound.length}`;
-        document.getElementById('message').className = "message message-info";
-        document.getElementById('message').innerHTML = "Click on the map!";
-        drawMap();
-        canClick = true;
-        document.getElementById('nextBtn').style.display = "block";
-        document.getElementById('shareBtn').style.display = "none";
-    }
+    function endGame() { gameActive = false; document.getElementById('message').className = "message game-complete"; document.getElementById('message').innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`; document.getElementById('progress').innerHTML = "🏁 Come back tomorrow for a new challenge! 🏁"; document.getElementById('nextBtn').style.display = "none"; document.getElementById('shareBtn').style.display = "block"; }
+    function loadNext() { if (currentIndex >= currentRound.length) { endGame(); return; } answered = false; showMarkers = false; clickPos = null; correctPos = null; currentState = currentRound[currentIndex]; document.getElementById('targetCity').innerText = currentState.name; document.getElementById('progress').innerHTML = `📍 Question ${currentIndex + 1} of ${currentRound.length}`; document.getElementById('message').className = "message message-info"; document.getElementById('message').innerHTML = "Click on the map!"; drawMap(); canClick = true; document.getElementById('nextBtn').style.display = "block"; document.getElementById('shareBtn').style.display = "none"; }
     
     function handleClick(e) {
         if (!gameActive || !canClick || !currentState || !mapLoaded || answered) return;
-        
         const rect = canvas.getBoundingClientRect();
-        const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
-        const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
-        
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clickX = (e.clientX - rect.left) * scaleX;
+        const clickY = (e.clientY - rect.top) * scaleY;
         const distanceKm = haversineDistance(clickX, clickY, currentState.x, currentState.y);
         const points = calculatePoints(distanceKm);
         totalScore += points;
-        
         questionPoints[currentIndex] = points;
         questionIcons[currentIndex] = getIconForPoints(points);
-        
         document.getElementById('score').innerText = totalScore;
-        
         const msgDiv = document.getElementById('message');
         let gradeClass = "miss";
         if (distanceKm <= 80) gradeClass = "perfect";
@@ -452,7 +242,6 @@
         else if (distanceKm <= 350) gradeClass = "close";
         msgDiv.className = `message ${gradeClass}`;
         msgDiv.innerHTML = `${getGradeText(distanceKm)}`;
-        
         showMarkers = true;
         clickPos = { x: clickX, y: clickY };
         correctPos = { x: currentState.x, y: currentState.y };
@@ -461,31 +250,15 @@
         canClick = false;
     }
     
-    function nextState() {
-        if (!gameActive) return;
-        if (!answered) { document.getElementById('message').innerHTML = "⚠️ Click on the map first!"; return; }
-        currentIndex++;
-        loadNext();
-    }
-    
-    function resetGame() {
-        if (!gameStarted || !gameActive) { document.getElementById('message').innerHTML = "⏰ You can only play once per day!"; }
-    }
-    
-    function initGame() {
-        gameStarted = true;
-        currentRound = getDailyStates();
-        const stateNames = currentRound.map(s => s.name).join(', ');
-        document.getElementById('dailyBadge').innerHTML = `🎯 Daily Challenge: ${stateNames}`;
-        loadNext();
-    }
-    
-    initGame();
+    function nextState() { if (!gameActive) return; if (!answered) { document.getElementById('message').innerHTML = "⚠️ Click on the map first!"; return; } currentIndex++; loadNext(); }
+    function resetGame() { if (!gameStarted || !gameActive) { document.getElementById('message').innerHTML = "⏰ You can only play once per day!"; } }
+    function initGame() { gameStarted = true; currentRound = getDailyStates(); const stateNames = currentRound.map(s => s.name).join(', '); document.getElementById('dailyBadge').innerHTML = `🎯 Daily Challenge: ${stateNames}`; loadNext(); }
     
     canvas.addEventListener('click', handleClick);
     document.getElementById('resetBtn').addEventListener('click', resetGame);
     document.getElementById('nextBtn').addEventListener('click', nextState);
     document.getElementById('shareBtn').addEventListener('click', shareScore);
+    document.getElementById('closeDailyLimitBtn').addEventListener('click', () => { document.getElementById('dailyLimitOverlay').classList.remove('show'); });
 </script>
 </body>
 </html>
