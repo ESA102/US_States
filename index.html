@@ -516,37 +516,45 @@
         document.getElementById('shareBtn').style.display = "none";
     }
     
-    function handleClick(e) {
-        if (!gameActive || !canClick || !currentState || !mapLoaded || answered) return;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const userX = (e.clientX - rect.left) * scaleX;
-        const userY = (e.clientY - rect.top) * scaleY;
-        const clickLatLon = pixelToLatLon(userX, userY);
-        const distanceKm = haversineDistance(clickLatLon.lat, clickLatLon.lon, currentState.lat, currentState.lon);
-        const points = calculatePoints(distanceKm, currentState.name);
-        totalScore += points;
-        questionPoints[currentIndex] = points;
-        questionIcons[currentIndex] = getIconForPoints(points);
-        document.getElementById('score').innerText = totalScore;
-        const msgDiv = document.getElementById('message');
-        let gradeClass = "miss";
-        const stateRadius = getStateRadiusKm(currentState.name);
-        if (distanceKm <= stateRadius) gradeClass = "perfect";
-        else if (distanceKm <= stateRadius + 50) gradeClass = "perfect";
-        else if (distanceKm <= stateRadius + 100) gradeClass = "good";
-        else if (distanceKm <= stateRadius + 150) gradeClass = "good";
-        else if (distanceKm <= stateRadius + 200) gradeClass = "close";
-        msgDiv.className = `message ${gradeClass}`;
-        msgDiv.innerHTML = `${getGradeText(distanceKm, currentState.name)}`;
-        showMarkers = true;
-        clickPos = { x: userX, y: userY };
-        correctPos = { x: currentState.x, y: currentState.y };
-        drawMap();
-        answered = true;
-        canClick = false;
-    }
+function handleClick(e) {
+    if (!gameActive || !canClick || !currentState || !mapLoaded || answered) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const userX = (e.clientX - rect.left) * scaleX;
+    const userY = (e.clientY - rect.top) * scaleY;
+    
+    const clickLatLon = pixelToLatLon(userX, userY);
+    const distanceKm = haversineDistance(clickLatLon.lat, clickLatLon.lon, currentState.lat, currentState.lon);
+    const points = calculatePoints(distanceKm, currentState.name);
+    totalScore += points;
+    
+    questionPoints[currentIndex] = points;
+    questionIcons[currentIndex] = getIconForPoints(points);
+    
+    document.getElementById('score').innerText = totalScore;
+    
+    const msgDiv = document.getElementById('message');
+    let gradeClass = "miss";
+    const stateRadius = getStateRadiusKm(currentState.name);
+    if (distanceKm <= stateRadius) gradeClass = "perfect";
+    else if (distanceKm <= stateRadius + 50) gradeClass = "perfect";
+    else if (distanceKm <= stateRadius + 100) gradeClass = "good";
+    else if (distanceKm <= stateRadius + 150) gradeClass = "good";
+    else if (distanceKm <= stateRadius + 200) gradeClass = "close";
+    
+    // DEBUG: Show the actual clicked coordinates
+    msgDiv.className = `message ${gradeClass}`;
+    msgDiv.innerHTML = `${getGradeText(distanceKm, currentState.name)}<br><small>DEBUG: Clicked at (${Math.round(clickLatLon.lat)}°, ${Math.round(clickLatLon.lon)}°)</small>`;
+    
+    showMarkers = true;
+    clickPos = { x: userX, y: userY };
+    correctPos = { x: currentState.x, y: currentState.y };
+    drawMap();
+    answered = true;
+    canClick = false;
+}
     
     function nextState() {
         if (!gameActive) return;
