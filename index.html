@@ -1,54 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Get Map Coordinates</title>
+    <title>Get Coordinates</title>
     <style>
-        body { background: #1a472a; display: flex; justify-content: center; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
-        canvas { 
-            border: 3px solid white; 
-            cursor: crosshair; 
-            max-width: 90vw; 
-            max-height: 70vh;
-            width: auto;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-        .info { background: #2c2b28; color: #ffd966; padding: 15px; margin-top: 20px; border-radius: 20px; font-family: monospace; max-width: 500px; margin: 20px auto; font-size: 14px; }
+        body { background: #1a472a; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { text-align: center; }
+        canvas { border: 3px solid white; cursor: crosshair; max-width: 95vw; max-height: 80vh; width: auto; height: auto; }
+        .info { background: #2c2b28; color: #ffd966; padding: 15px; margin-top: 20px; border-radius: 20px; font-family: monospace; display: inline-block; text-align: left; }
     </style>
 </head>
 <body>
-<div>
+<div class="container">
     <canvas id="myCanvas"></canvas>
     <div class="info" id="info">
-        👇 Click on these states (in order):<br>
+        Click on these 5 states (in order):<br>
         1. California<br>
         2. Texas<br>
         3. New York<br>
         4. North Dakota<br>
         5. Florida<br>
         <br>
-        Write down each X,Y coordinate.
+        <span id="result"></span>
     </div>
 </div>
 <script>
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
-    
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
+    
+    let clicks = [];
+    const states = ["California", "Texas", "New York", "North Dakota", "Florida"];
     
     mapImage.onload = () => {
         canvas.width = mapImage.width;
         canvas.height = mapImage.height;
         ctx.drawImage(mapImage, 0, 0);
-        ctx.font = "24px Arial";
+        ctx.font = "30px Arial";
         ctx.fillStyle = "red";
         ctx.fillText("Click on California", 50, 80);
     };
-    
-    let clickCount = 0;
-    const states = ["California", "Texas", "New York", "North Dakota", "Florida"];
     
     canvas.addEventListener('click', (e) => {
         const rect = canvas.getBoundingClientRect();
@@ -57,21 +48,22 @@
         const x = Math.round((e.clientX - rect.left) * scaleX);
         const y = Math.round((e.clientY - rect.top) * scaleY);
         
-        const infoDiv = document.getElementById('info');
-        infoDiv.innerHTML += `<br>✅ ${states[clickCount]}: X=${x}, Y=${y}`;
+        clicks.push({ state: states[clicks.length], x: x, y: y });
         
-        clickCount++;
-        if (clickCount < states.length) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = clicks.map(c => `${c.state}: X=${c.x}, Y=${c.y}`).join('<br>');
+        
+        if (clicks.length < 5) {
             ctx.fillStyle = "red";
-            ctx.fillText(`Click on ${states[clickCount]}`, 50, 80 + (clickCount * 50));
+            ctx.fillText(`Click on ${states[clicks.length]}`, 50, 80 + (clicks.length * 50));
         } else {
             ctx.fillStyle = "green";
-            ctx.fillText("Done! Give me these coordinates.", 50, 80 + (clickCount * 50));
+            ctx.fillText("DONE! Copy the 5 coordinates above.", 50, 80 + (clicks.length * 50));
         }
     });
     
     mapImage.onerror = () => {
-        document.getElementById('info').innerHTML = "❌ Map image not found! Make sure blank_US_states.png is in the same folder.";
+        document.getElementById('info').innerHTML = "ERROR: blank_US_states.png not found!";
     };
 </script>
 </body>
