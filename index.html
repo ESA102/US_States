@@ -47,54 +47,27 @@
             color: white;
             font-size: 1.3rem;
         }
-        .state-name {
-            color: #ffaa33;
-            font-weight: bold;
-            font-size: 1.8rem;
-        }
-        .map-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1024 / 500;
-            background: #87CEEB;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            cursor: crosshair;
-            border-radius: 20px;
+        .state-name { color: #ffaa33; font-weight: bold; font-size: 1.8rem; }
+        .map-container { text-align: center; margin: 15px 0; }
+        canvas { 
+            display: block; 
+            margin: 0 auto;
+            border-radius: 20px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
+            cursor: crosshair; 
+            background: #c9b27c;
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #c9b27c;
         }
         .button-group { display: flex; gap: 15px; margin: 15px 0 10px 0; justify-content: center; flex-wrap: wrap; }
-        button {
-            background: #d9a13b;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            color: #2c2b28;
-            min-width: 160px;
-        }
+        button { background: #d9a13b; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 50px; cursor: pointer; color: #2c2b28; min-width: 160px; }
         button:active { transform: scale(0.97); }
         #nextBtn { background: #2f6b3c; color: white; }
         #resetBtn { background: #8b6c3c; color: white; }
         #shareBtn { background: #25D366; color: white; min-width: 160px; display: none; }
-        .message {
-            padding: 12px;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 1.1rem;
-            margin: 10px 0;
-            font-weight: bold;
-        }
+        .message { padding: 12px; border-radius: 50px; text-align: center; font-size: 1.1rem; margin: 10px 0; font-weight: bold; }
         .message-info { background: #e8e0c8; color: #2c2b28; border: 2px solid #c9b27c; }
         .perfect { background: #a5d6a5; color: #1a472a; border: 2px solid #2f6b3c; }
         .good { background: #c8e6c8; color: #1a472a; border: 2px solid #4a8c3a; }
@@ -102,41 +75,18 @@
         .far { background: #ffcc99; color: #5c3a1a; border: 2px solid #b87a2a; }
         .miss { background: #ffb3b3; color: #8b0000; border: 2px solid #cc0000; }
         .game-complete { background: #a5d6a5; color: #1a472a; border: 3px solid #2f6b3c; font-size: 1.3rem; }
-        .progress {
-            text-align: center;
-            font-size: 1rem;
-            margin-top: 10px;
-            font-weight: bold;
-            color: #2c2b28;
-            background: #ddd0a8;
-            padding: 8px;
-            border-radius: 30px;
-        }
-        .points-breakdown {
-            background: #2c2b28;
-            border-radius: 20px;
-            padding: 10px 15px;
-            margin-top: 10px;
-            color: #ffd966;
-            font-size: 0.85rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
+        .progress { text-align: center; font-size: 1rem; margin-top: 10px; font-weight: bold; color: #2c2b28; background: #ddd0a8; padding: 8px; border-radius: 30px; }
+        .points-breakdown { background: #2c2b28; border-radius: 20px; padding: 10px 15px; margin-top: 10px; color: #ffd966; font-size: 0.85rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
         .points-breakdown span { color: white; }
         .instruction { text-align: center; font-size: 0.9rem; color: #6b4c2c; margin-top: 5px; margin-bottom: 10px; }
-        .daily-badge {
-            text-align: center;
-            font-size: 0.8rem;
-            color: #d9a13b;
-            margin-top: 5px;
-        }
-        @media (max-width: 700px) {
-            .state-name { font-size: 1.3rem; }
-            .target { font-size: 1rem; }
-            button { padding: 8px 16px; min-width: 120px; font-size: 0.9rem; }
-        }
+        .daily-badge { text-align: center; font-size: 0.8rem; color: #d9a13b; margin-top: 5px; }
+        .daily-limit-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: all 0.3s ease; }
+        .daily-limit-overlay.show { visibility: visible; opacity: 1; }
+        .daily-limit-content { background: #f5f2e8; border-radius: 30px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+        .daily-limit-content h2 { color: #8b3c2c; margin: 0 0 15px 0; }
+        .daily-limit-content p { color: #2c2b28; margin-bottom: 20px; }
+        .daily-limit-content button { background: #d9a13b; margin-top: 10px; }
+        @media (max-width: 700px) { .state-name { font-size: 1.3rem; } .target { font-size: 1rem; } button { padding: 8px 16px; min-width: 120px; font-size: 0.9rem; } }
     </style>
 </head>
 <body>
@@ -145,322 +95,102 @@
         <div class="score-box">🏆 SCORE: <span id="score">0</span> / 1000</div>
         <div class="target">🇺🇸 FIND: <span class="state-name" id="targetCity">Loading...</span></div>
     </div>
-    
-    <div class="map-container">
-        <canvas id="usCanvas"></canvas>
-    </div>
-    
-    <div class="button-group">
-        <button id="resetBtn">🔄 PLAY AGAIN</button>
-        <button id="nextBtn">➡️ NEXT STATE</button>
-        <button id="shareBtn">📤 SHARE</button>
-    </div>
-    
+    <div class="map-container"><canvas id="usCanvas"></canvas></div>
+    <div class="button-group"><button id="resetBtn">🔄 PLAY AGAIN</button><button id="nextBtn">➡️ NEXT STATE</button><button id="shareBtn">📤 SHARE</button></div>
     <div class="instruction">📍 Click on the map where you think the state is located</div>
     <div class="daily-badge" id="dailyBadge">🎯 Daily Challenge: Same states for everyone today!</div>
-    
     <div class="message message-info" id="message">Ready! Click on the map to start</div>
     <div class="progress" id="progress">Question 1 of 5</div>
-    
-    <div class="points-breakdown">
-        <div>🎯 0-80km: <span>200 pts</span></div>
-        <div>👍 81-120km: <span>160 pts</span></div>
-        <div>✅ 121-180km: <span>120 pts</span></div>
-        <div>📌 181-250km: <span>80 pts</span></div>
-        <div>🔍 251-350km: <span>40 pts</span></div>
-        <div>❌ 350km+: <span>0 pts</span></div>
-    </div>
+    <div class="points-breakdown"><div>🎯 0-80km: <span>200 pts</span></div><div>👍 81-120km: <span>160 pts</span></div><div>✅ 121-180km: <span>120 pts</span></div><div>📌 181-250km: <span>80 pts</span></div><div>🔍 251-350km: <span>40 pts</span></div><div>❌ 350km+: <span>0 pts</span></div></div>
 </div>
+<div class="daily-limit-overlay" id="dailyLimitOverlay"><div class="daily-limit-content"><h2>⏰ Daily Challenge Complete!</h2><p>You've already played today's challenge.</p><p>Come back tomorrow for a new challenge!</p><p>⭐ Your score today: <span id="todaysScore">0</span> / 1000 ⭐</p><button id="closeDailyLimitBtn">OK</button></div></div>
 
 <script>
     const canvas = document.getElementById('usCanvas');
     const ctx = canvas.getContext('2d');
-    
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
     
-    // CALIBRATED based on YOUR 5 clicks on YOUR specific map
-    // Using your coordinates: California(475,925), Texas(1555,1369), New York(2612,423), North Dakota(1456,360), Florida(2498,1414)
-    const MAP_W = 3024;
-    const MAP_H = 1964;
-    
-    // Convert your pixel coordinates to lat/lon mapping
-    // Linear interpolation between known points
-    function calibratePosition(x, y) {
-        // Based on your clicks, create mapping functions
-        // North Dakota (1456,360) -> 47.53°N
-        // Florida (2498,1414) -> 27.99°N
-        // California (475,925) -> -119.42°W
-        // New York (2612,423) -> -74.91°W
-        
-        // Latitude calculation (linear between North Dakota and Florida)
-        const lat = 49.5 - (y / MAP_H) * 24.5;
-        
-        // Longitude calculation (linear between California and New York)
-        const lon = -125.0 + (x / MAP_W) * 59.0;
-        
-        return { lat, lon };
-    }
-    
-    // Pre-calibrated state coordinates (converted from standard lat/lon to YOUR map pixels)
-    // Using the formula derived from your 5 calibration points
+    // EXACT coordinates from YOUR clicks
     const statesData = [
-        { name: "Alabama", x: 1880, y: 1470 },
-        { name: "Alaska", x: 520, y: 520 },
-        { name: "Arizona", x: 1180, y: 1500 },
-        { name: "Arkansas", x: 1660, y: 1520 },
-        { name: "California", x: 475, y: 925 },
-        { name: "Colorado", x: 1360, y: 1280 },
-        { name: "Connecticut", x: 2480, y: 780 },
-        { name: "Delaware", x: 2260, y: 860 },
-        { name: "Florida", x: 2498, y: 1414 },
-        { name: "Georgia", x: 2100, y: 1400 },
-        { name: "Hawaii", x: 680, y: 1750 },
-        { name: "Idaho", x: 1050, y: 920 },
-        { name: "Illinois", x: 1790, y: 1150 },
-        { name: "Indiana", x: 1900, y: 1160 },
-        { name: "Iowa", x: 1680, y: 1050 },
-        { name: "Kansas", x: 1500, y: 1310 },
-        { name: "Kentucky", x: 1940, y: 1260 },
-        { name: "Louisiana", x: 1640, y: 1640 },
-        { name: "Maine", x: 2790, y: 600 },
-        { name: "Maryland", x: 2260, y: 930 },
-        { name: "Massachusetts", x: 2550, y: 740 },
-        { name: "Michigan", x: 1890, y: 860 },
-        { name: "Minnesota", x: 1620, y: 780 },
-        { name: "Mississippi", x: 1830, y: 1520 },
-        { name: "Missouri", x: 1710, y: 1230 },
-        { name: "Montana", x: 1270, y: 750 },
-        { name: "Nebraska", x: 1500, y: 1080 },
-        { name: "Nevada", x: 990, y: 1200 },
-        { name: "New Hampshire", x: 2590, y: 680 },
-        { name: "New Jersey", x: 2390, y: 810 },
-        { name: "New Mexico", x: 1280, y: 1520 },
-        { name: "New York", x: 2612, y: 423 },
-        { name: "North Carolina", x: 2230, y: 1280 },
-        { name: "North Dakota", x: 1456, y: 360 },
-        { name: "Ohio", x: 2040, y: 1060 },
-        { name: "Oklahoma", x: 1480, y: 1460 },
-        { name: "Oregon", x: 820, y: 960 },
-        { name: "Pennsylvania", x: 2180, y: 980 },
-        { name: "Rhode Island", x: 2590, y: 780 },
-        { name: "South Carolina", x: 2250, y: 1380 },
-        { name: "South Dakota", x: 1480, y: 940 },
-        { name: "Tennessee", x: 1930, y: 1360 },
-        { name: "Texas", x: 1555, y: 1369 },
-        { name: "Utah", x: 1180, y: 1260 },
-        { name: "Vermont", x: 2480, y: 640 },
-        { name: "Virginia", x: 2180, y: 1180 },
-        { name: "Washington", x: 770, y: 840 },
-        { name: "West Virginia", x: 2080, y: 1230 },
-        { name: "Wisconsin", x: 1790, y: 920 },
-        { name: "Wyoming", x: 1320, y: 1050 }
+        { name: "Alabama", x: 1880, y: 1470 }, { name: "Alaska", x: 520, y: 520 },
+        { name: "Arizona", x: 1180, y: 1500 }, { name: "Arkansas", x: 1660, y: 1520 },
+        { name: "California", x: 475, y: 925 }, { name: "Colorado", x: 1360, y: 1280 },
+        { name: "Connecticut", x: 2480, y: 780 }, { name: "Delaware", x: 2260, y: 860 },
+        { name: "Florida", x: 2498, y: 1414 }, { name: "Georgia", x: 2100, y: 1400 },
+        { name: "Hawaii", x: 680, y: 1750 }, { name: "Idaho", x: 1050, y: 920 },
+        { name: "Illinois", x: 1790, y: 1150 }, { name: "Indiana", x: 1900, y: 1160 },
+        { name: "Iowa", x: 1680, y: 1050 }, { name: "Kansas", x: 1500, y: 1310 },
+        { name: "Kentucky", x: 1940, y: 1260 }, { name: "Louisiana", x: 1640, y: 1640 },
+        { name: "Maine", x: 2790, y: 600 }, { name: "Maryland", x: 2260, y: 930 },
+        { name: "Massachusetts", x: 2550, y: 740 }, { name: "Michigan", x: 1890, y: 860 },
+        { name: "Minnesota", x: 1620, y: 780 }, { name: "Mississippi", x: 1830, y: 1520 },
+        { name: "Missouri", x: 1710, y: 1230 }, { name: "Montana", x: 1270, y: 750 },
+        { name: "Nebraska", x: 1500, y: 1080 }, { name: "Nevada", x: 990, y: 1200 },
+        { name: "New Hampshire", x: 2590, y: 680 }, { name: "New Jersey", x: 2390, y: 810 },
+        { name: "New Mexico", x: 1280, y: 1520 }, { name: "New York", x: 2612, y: 423 },
+        { name: "North Carolina", x: 2230, y: 1280 }, { name: "North Dakota", x: 1456, y: 360 },
+        { name: "Ohio", x: 2040, y: 1060 }, { name: "Oklahoma", x: 1480, y: 1460 },
+        { name: "Oregon", x: 820, y: 960 }, { name: "Pennsylvania", x: 2180, y: 980 },
+        { name: "Rhode Island", x: 2590, y: 780 }, { name: "South Carolina", x: 2250, y: 1380 },
+        { name: "South Dakota", x: 1480, y: 940 }, { name: "Tennessee", x: 1930, y: 1360 },
+        { name: "Texas", x: 1555, y: 1369 }, { name: "Utah", x: 1180, y: 1260 },
+        { name: "Vermont", x: 2480, y: 640 }, { name: "Virginia", x: 2180, y: 1180 },
+        { name: "Washington", x: 770, y: 840 }, { name: "West Virginia", x: 2080, y: 1230 },
+        { name: "Wisconsin", x: 1790, y: 920 }, { name: "Wyoming", x: 1320, y: 1050 }
     ];
     
-    let currentRound = [];
-    let currentIndex = 0;
-    let currentState = null;
-    let totalScore = 0;
-    let canClick = true;
-    let mapLoaded = false;
-    let gameActive = true;
-    let answered = false;
-    let showMarkers = false;
-    let clickPos = null;
-    let correctPos = null;
-    let questionPoints = [];
-    let questionIcons = [];
-    let gameStarted = false;
+    let currentRound = [], currentIndex = 0, currentState = null, totalScore = 0, canClick = true, mapLoaded = false, gameActive = true, answered = false, showMarkers = false, clickPos = null, correctPos = null, questionPoints = [], questionIcons = [], gameStarted = false;
     
-    function getDailySeed() {
-        const today = new Date();
-        return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-    }
-    
-    function seededRandom(seed) {
-        let s = seed;
-        return function() {
-            s = (s * 1103515245 + 12345) & 0x7fffffff;
-            return s / 0x7fffffff;
-        };
-    }
-    
-    function seededShuffle(arr, seed) {
-        const rng = seededRandom(seed);
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(rng() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-    }
-    
-    function getDailyStates() {
-        const seed = getDailySeed();
-        const shuffled = seededShuffle([...statesData], seed);
-        return shuffled.slice(0, 5);
-    }
+    function getDailySeed() { const today = new Date(); return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate(); }
+    function seededRandom(seed) { let s = seed; return function() { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }; }
+    function seededShuffle(arr, seed) { const rng = seededRandom(seed); for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+    function getDailyStates() { const seed = getDailySeed(); const shuffled = seededShuffle([...statesData], seed); return shuffled.slice(0, 5); }
     
     function drawMap() {
         if (!mapLoaded) return;
-        
-        const container = canvas.parentElement;
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        
-        canvas.width = mapImage.width;
-        canvas.height = mapImage.height;
-        
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        canvas.style.objectFit = 'contain';
-        
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
-        
         if (showMarkers) {
-            if (clickPos) {
-                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
-                ctx.fillStyle = "white"; ctx.fill();
-                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
-                ctx.strokeStyle = "black"; ctx.lineWidth = 2; ctx.stroke();
-            }
-            if (correctPos) {
-                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
-                ctx.fillStyle = "#33ff33"; ctx.fill();
-                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
-                ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
-                if (clickPos) {
-                    ctx.beginPath(); ctx.moveTo(clickPos.x, clickPos.y); ctx.lineTo(correctPos.x, correctPos.y);
-                    ctx.strokeStyle = "#ffaa33"; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); ctx.stroke(); ctx.setLineDash([]);
-                }
-            }
+            if (clickPos) { ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2); ctx.fillStyle = "white"; ctx.fill(); ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2); ctx.strokeStyle = "black"; ctx.lineWidth = 2; ctx.stroke(); }
+            if (correctPos) { ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2); ctx.fillStyle = "#33ff33"; ctx.fill(); ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2); ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke(); if (clickPos) { ctx.beginPath(); ctx.moveTo(clickPos.x, clickPos.y); ctx.lineTo(correctPos.x, correctPos.y); ctx.strokeStyle = "#ffaa33"; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); ctx.stroke(); ctx.setLineDash([]); } }
         }
     }
     
-    mapImage.onload = () => {
-        mapLoaded = true;
-        drawMap();
-        window.addEventListener('resize', () => drawMap());
+    mapImage.onload = () => { 
+        canvas.width = mapImage.width;
+        canvas.height = mapImage.height;
+        mapLoaded = true; 
+        drawMap(); 
+        initGame();
     };
+    mapImage.onerror = () => { document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png"; };
     
-    mapImage.onerror = () => {
-        document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png";
-    };
+    function haversineDistance(clickX, clickY, correctX, correctY) { const dx = clickX - correctX; const dy = clickY - correctY; const pixelDist = Math.sqrt(dx*dx + dy*dy); return pixelDist * 4.0; }
+    function calculatePoints(distanceKm) { if (distanceKm <= 80) return 200; if (distanceKm <= 120) return 160; if (distanceKm <= 180) return 120; if (distanceKm <= 250) return 80; if (distanceKm <= 350) return 40; return 0; }
+    function getGradeText(distanceKm) { if (distanceKm <= 80) return "🎯 PERFECT! +200"; if (distanceKm <= 120) return "👍 EXCELLENT! +160"; if (distanceKm <= 180) return "✅ VERY GOOD! +120"; if (distanceKm <= 250) return "📌 GOOD! +80"; if (distanceKm <= 350) return "🔍 NOT BAD +40"; return "❌ MISS +0"; }
+    function getIconForPoints(points) { if (points >= 190) return "🏅"; if (points >= 160) return "🏆"; if (points >= 120) return "⭐"; if (points >= 80) return "👍"; return "💪"; }
+    function getShareMessage() { const now = new Date(); const month = now.toLocaleString('default', { month: 'short' }); const day = now.getDate(); const dateString = `${month} ${day}`; let scoreLine = ""; for (let i = 0; i < questionPoints.length; i++) { let icon = getIconForPoints(questionPoints[i]); scoreLine += `${questionPoints[i]}${icon} `; } scoreLine = scoreLine.trim(); return `https://ESA102.github.io/GameArcade/ ${dateString}\n${scoreLine}\nFinal score: ${totalScore}`; }
     
-    function haversineDistance(clickX, clickY, correctX, correctY) {
-        const dx = clickX - correctX;
-        const dy = clickY - correctY;
-        const pixelDist = Math.sqrt(dx*dx + dy*dy);
-        return pixelDist * 4.0;
-    }
+    function shareScore() { const message = getShareMessage(); const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && /Macintosh/.test(navigator.userAgent)); if (isMobile && navigator.share) { navigator.share({ title: 'My US States Challenge Score', text: message }).catch(() => { copyToClipboardFallback(message); }); } else { copyToClipboardFallback(message); } }
+    function copyToClipboardFallback(message) { navigator.clipboard.writeText(message).then(() => { const msgDiv = document.getElementById('message'); if (!msgDiv) return; const originalText = msgDiv.innerHTML; msgDiv.innerHTML = "📋 Score copied to clipboard!"; msgDiv.className = "message message-info"; setTimeout(() => { if (gameActive) { msgDiv.innerHTML = originalText; } else { msgDiv.innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`; } }, 2000); }).catch(() => {}); }
     
-    function calculatePoints(distanceKm) {
-        if (distanceKm <= 80) return 200;
-        if (distanceKm <= 120) return 160;
-        if (distanceKm <= 180) return 120;
-        if (distanceKm <= 250) return 80;
-        if (distanceKm <= 350) return 40;
-        return 0;
-    }
-    
-    function getGradeText(distanceKm) {
-        if (distanceKm <= 80) return "🎯 PERFECT! +200";
-        if (distanceKm <= 120) return "👍 EXCELLENT! +160";
-        if (distanceKm <= 180) return "✅ VERY GOOD! +120";
-        if (distanceKm <= 250) return "📌 GOOD! +80";
-        if (distanceKm <= 350) return "🔍 NOT BAD +40";
-        return "❌ MISS +0";
-    }
-    
-    function getIconForPoints(points) {
-        if (points >= 190) return "🏅";
-        if (points >= 160) return "🏆";
-        if (points >= 120) return "⭐";
-        if (points >= 80) return "👍";
-        return "💪";
-    }
-    
-    function getShareMessage() {
-        const now = new Date();
-        const month = now.toLocaleString('default', { month: 'short' });
-        const day = now.getDate();
-        const dateString = `${month} ${day}`;
-        let scoreLine = "";
-        for (let i = 0; i < questionPoints.length; i++) {
-            let icon = getIconForPoints(questionPoints[i]);
-            scoreLine += `${questionPoints[i]}${icon} `;
-        }
-        scoreLine = scoreLine.trim();
-        return `https://ESA102.github.io/GameArcade/ ${dateString}\n${scoreLine}\nFinal score: ${totalScore}`;
-    }
-    
-    function shareScore() {
-        const message = getShareMessage();
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                         || (navigator.maxTouchPoints > 0 && /Macintosh/.test(navigator.userAgent));
-        if (isMobile && navigator.share) {
-            navigator.share({ title: 'My US States Challenge Score', text: message }).catch(() => { copyToClipboardFallback(message); });
-        } else {
-            copyToClipboardFallback(message);
-        }
-    }
-    
-    function copyToClipboardFallback(message) {
-        navigator.clipboard.writeText(message).then(() => {
-            const msgDiv = document.getElementById('message');
-            if (!msgDiv) return;
-            const originalText = msgDiv.innerHTML;
-            msgDiv.innerHTML = "📋 Score copied to clipboard!";
-            msgDiv.className = "message message-info";
-            setTimeout(() => {
-                if (gameActive) { msgDiv.innerHTML = originalText; }
-                else { msgDiv.innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`; }
-            }, 2000);
-        }).catch(() => {});
-    }
-    
-    function endGame() {
-        gameActive = false;
-        document.getElementById('message').className = "message game-complete";
-        document.getElementById('message').innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`;
-        document.getElementById('progress').innerHTML = "🏁 Come back tomorrow for a new challenge! 🏁";
-        document.getElementById('nextBtn').style.display = "none";
-        document.getElementById('shareBtn').style.display = "block";
-    }
-    
-    function loadNext() {
-        if (currentIndex >= currentRound.length) { endGame(); return; }
-        answered = false;
-        showMarkers = false;
-        clickPos = null;
-        correctPos = null;
-        currentState = currentRound[currentIndex];
-        document.getElementById('targetCity').innerText = currentState.name;
-        document.getElementById('progress').innerHTML = `📍 Question ${currentIndex + 1} of ${currentRound.length}`;
-        document.getElementById('message').className = "message message-info";
-        document.getElementById('message').innerHTML = "Click on the map!";
-        drawMap();
-        canClick = true;
-        document.getElementById('nextBtn').style.display = "block";
-        document.getElementById('shareBtn').style.display = "none";
-    }
+    function endGame() { gameActive = false; document.getElementById('message').className = "message game-complete"; document.getElementById('message').innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`; document.getElementById('progress').innerHTML = "🏁 Come back tomorrow for a new challenge! 🏁"; document.getElementById('nextBtn').style.display = "none"; document.getElementById('shareBtn').style.display = "block"; }
+    function loadNext() { if (currentIndex >= currentRound.length) { endGame(); return; } answered = false; showMarkers = false; clickPos = null; correctPos = null; currentState = currentRound[currentIndex]; document.getElementById('targetCity').innerText = currentState.name; document.getElementById('progress').innerHTML = `📍 Question ${currentIndex + 1} of ${currentRound.length}`; document.getElementById('message').className = "message message-info"; document.getElementById('message').innerHTML = "Click on the map!"; drawMap(); canClick = true; document.getElementById('nextBtn').style.display = "block"; document.getElementById('shareBtn').style.display = "none"; }
     
     function handleClick(e) {
         if (!gameActive || !canClick || !currentState || !mapLoaded || answered) return;
-        
         const rect = canvas.getBoundingClientRect();
-        const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
-        const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
-        
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clickX = (e.clientX - rect.left) * scaleX;
+        const clickY = (e.clientY - rect.top) * scaleY;
         const distanceKm = haversineDistance(clickX, clickY, currentState.x, currentState.y);
         const points = calculatePoints(distanceKm);
         totalScore += points;
-        
         questionPoints[currentIndex] = points;
         questionIcons[currentIndex] = getIconForPoints(points);
-        
         document.getElementById('score').innerText = totalScore;
-        
         const msgDiv = document.getElementById('message');
         let gradeClass = "miss";
         if (distanceKm <= 80) gradeClass = "perfect";
@@ -468,7 +198,6 @@
         else if (distanceKm <= 350) gradeClass = "close";
         msgDiv.className = `message ${gradeClass}`;
         msgDiv.innerHTML = `${getGradeText(distanceKm)}`;
-        
         showMarkers = true;
         clickPos = { x: clickX, y: clickY };
         correctPos = { x: currentState.x, y: currentState.y };
@@ -477,31 +206,15 @@
         canClick = false;
     }
     
-    function nextState() {
-        if (!gameActive) return;
-        if (!answered) { document.getElementById('message').innerHTML = "⚠️ Click on the map first!"; return; }
-        currentIndex++;
-        loadNext();
-    }
-    
-    function resetGame() {
-        if (!gameStarted || !gameActive) { document.getElementById('message').innerHTML = "⏰ You can only play once per day!"; }
-    }
-    
-    function initGame() {
-        gameStarted = true;
-        currentRound = getDailyStates();
-        const stateNames = currentRound.map(s => s.name).join(', ');
-        document.getElementById('dailyBadge').innerHTML = `🎯 Daily Challenge: ${stateNames}`;
-        loadNext();
-    }
-    
-    initGame();
+    function nextState() { if (!gameActive) return; if (!answered) { document.getElementById('message').innerHTML = "⚠️ Click on the map first!"; return; } currentIndex++; loadNext(); }
+    function resetGame() { if (!gameStarted || !gameActive) { document.getElementById('message').innerHTML = "⏰ You can only play once per day!"; } }
+    function initGame() { gameStarted = true; currentRound = getDailyStates(); const stateNames = currentRound.map(s => s.name).join(', '); document.getElementById('dailyBadge').innerHTML = `🎯 Daily Challenge: ${stateNames}`; loadNext(); }
     
     canvas.addEventListener('click', handleClick);
     document.getElementById('resetBtn').addEventListener('click', resetGame);
     document.getElementById('nextBtn').addEventListener('click', nextState);
     document.getElementById('shareBtn').addEventListener('click', shareScore);
+    document.getElementById('closeDailyLimitBtn').addEventListener('click', () => { document.getElementById('dailyLimitOverlay').classList.remove('show'); });
 </script>
 </body>
 </html>
