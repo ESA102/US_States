@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Get Map Coordinates - NO DISTORTION</title>
+    <title>Get Map Coordinates</title>
     <style>
-        body { background: #1a472a; display: flex; justify-content: center; padding: 20px; }
-        canvas { border: 3px solid white; cursor: crosshair; }
-        .info { background: #2c2b28; color: #ffd966; padding: 15px; margin-top: 20px; border-radius: 20px; font-family: monospace; max-width: 800px; }
+        body { background: #1a472a; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        canvas { 
+            border: 3px solid white; 
+            cursor: crosshair; 
+            max-width: 100%; 
+            height: auto; 
+            display: block;
+            margin: 0 auto;
+        }
+        .info { background: #2c2b28; color: #ffd966; padding: 15px; margin-top: 20px; border-radius: 20px; font-family: monospace; max-width: 600px; margin: 20px auto; }
     </style>
 </head>
 <body>
 <div>
-    <canvas id="myCanvas" width="3024" height="1964"></canvas>
+    <canvas id="myCanvas"></canvas>
     <div class="info" id="info">
         👇 Click on these states:<br>
         1. California<br>
@@ -26,15 +33,14 @@
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
     
-    // EXACT dimensions - NO CSS scaling, NO distortion
-    canvas.width = 3024;
-    canvas.height = 1964;
-    
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
     
     mapImage.onload = () => {
-        ctx.drawImage(mapImage, 0, 0, 3024, 1964);
+        // Set canvas to exact image dimensions - NO DISTORTION
+        canvas.width = mapImage.width;
+        canvas.height = mapImage.height;
+        ctx.drawImage(mapImage, 0, 0);
         ctx.font = "30px Arial";
         ctx.fillStyle = "red";
         ctx.fillText("Click on California", 50, 80);
@@ -44,8 +50,11 @@
     const states = ["California", "Texas", "New York", "North Dakota", "Florida"];
     
     canvas.addEventListener('click', (e) => {
-        const x = e.offsetX;
-        const y = e.offsetY;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = Math.round((e.clientX - rect.left) * scaleX);
+        const y = Math.round((e.clientY - rect.top) * scaleY);
         
         const infoDiv = document.getElementById('info');
         infoDiv.innerHTML += `<br>✅ ${states[clickCount]}: X=${x}, Y=${y}`;
@@ -56,7 +65,7 @@
             ctx.fillText(`Click on ${states[clickCount]}`, 50, 80 + (clickCount * 50));
         } else {
             ctx.fillStyle = "green";
-            ctx.fillText("Done! Give me these 5 coordinates.", 50, 80 + (clickCount * 50));
+            ctx.fillText("Done!", 50, 80 + (clickCount * 50));
         }
     });
     
