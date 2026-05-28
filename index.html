@@ -3,23 +3,25 @@
 <head>
     <title>Get Map Coordinates</title>
     <style>
-        body { background: #1a472a; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        body { background: #1a472a; display: flex; justify-content: center; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
         canvas { 
             border: 3px solid white; 
             cursor: crosshair; 
-            max-width: 100%; 
-            height: auto; 
+            max-width: 90vw; 
+            max-height: 70vh;
+            width: auto;
+            height: auto;
             display: block;
             margin: 0 auto;
         }
-        .info { background: #2c2b28; color: #ffd966; padding: 15px; margin-top: 20px; border-radius: 20px; font-family: monospace; max-width: 600px; margin: 20px auto; }
+        .info { background: #2c2b28; color: #ffd966; padding: 15px; margin-top: 20px; border-radius: 20px; font-family: monospace; max-width: 500px; margin: 20px auto; font-size: 14px; }
     </style>
 </head>
 <body>
 <div>
     <canvas id="myCanvas"></canvas>
     <div class="info" id="info">
-        👇 Click on these states:<br>
+        👇 Click on these states (in order):<br>
         1. California<br>
         2. Texas<br>
         3. New York<br>
@@ -37,11 +39,10 @@
     mapImage.src = 'blank_US_states.png';
     
     mapImage.onload = () => {
-        // Set canvas to exact image dimensions - NO DISTORTION
         canvas.width = mapImage.width;
         canvas.height = mapImage.height;
         ctx.drawImage(mapImage, 0, 0);
-        ctx.font = "30px Arial";
+        ctx.font = "24px Arial";
         ctx.fillStyle = "red";
         ctx.fillText("Click on California", 50, 80);
     };
@@ -65,7 +66,7 @@
             ctx.fillText(`Click on ${states[clickCount]}`, 50, 80 + (clickCount * 50));
         } else {
             ctx.fillStyle = "green";
-            ctx.fillText("Done!", 50, 80 + (clickCount * 50));
+            ctx.fillText("Done! Give me these coordinates.", 50, 80 + (clickCount * 50));
         }
     });
     
