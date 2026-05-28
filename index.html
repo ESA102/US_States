@@ -45,7 +45,7 @@
             border-radius: 20px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             cursor: crosshair;
-            background: #87CEEB;
+            background: #c9b27c;
             width: 100%;
             height: auto;
             border: 2px solid #c9b27c;
@@ -114,11 +114,11 @@
 <body>
 <div class="game">
     <div class="header">
-        <div class="target">🔧 CALIBRATION MODE</div>
+        <div class="target">🔧 CALIBRATION MODE - Click states below, then click on map</div>
     </div>
     
     <div class="map-container">
-        <canvas id="usCanvas"></canvas>
+        <canvas id="usCanvas" width="1024" height="500"></canvas>
     </div>
     
     <div class="instruction">📍 Click on a state name below, then CLICK ON THE MAP where that state belongs</div>
@@ -139,11 +139,12 @@
     const canvas = document.getElementById('usCanvas');
     const ctx = canvas.getContext('2d');
     
+    canvas.width = 1024;
+    canvas.height = 500;
+    
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
     
-    let CANVAS_W = 0;
-    let CANVAS_H = 0;
     let mapLoaded = false;
     
     // All 50 states
@@ -174,7 +175,7 @@
     
     function savePositions() {
         localStorage.setItem('us_states_calibrated', JSON.stringify(states));
-        alert('✅ Positions saved! Click "SAVE & PLAY GAME" to start playing.');
+        alert('✅ Positions saved!');
         updateUI();
         drawMap();
     }
@@ -205,8 +206,8 @@
     function drawMap(clickHintX = null, clickHintY = null) {
         if (!mapLoaded) return;
         
-        ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-        ctx.drawImage(mapImage, 0, 0, CANVAS_W, CANVAS_H);
+        ctx.clearRect(0, 0, 1024, 500);
+        ctx.drawImage(mapImage, 0, 0, 1024, 500);
         
         // Draw all placed state markers
         for (let state of states) {
@@ -251,10 +252,6 @@
     }
     
     mapImage.onload = () => {
-        CANVAS_W = mapImage.width;
-        CANVAS_H = mapImage.height;
-        canvas.width = CANVAS_W;
-        canvas.height = CANVAS_H;
         mapLoaded = true;
         drawMap();
     };
@@ -296,10 +293,9 @@
             return;
         }
         
-        // Save the calibrated positions to use in the game
         localStorage.setItem('us_states_calibrated', JSON.stringify(states));
         
-        // Generate the game HTML with these exact positions
+        // Generate the game HTML
         const stateData = states.map(s => `{ name: "${s.name}", x: ${Math.round(s.x)}, y: ${Math.round(s.y)} }`).join(',\n        ');
         
         const gameHTML = `<!DOCTYPE html>
@@ -470,7 +466,7 @@
         <div class="target">🇺🇸 FIND: <span class="state-name" id="targetCity">Loading...</span></div>
     </div>
     <div class="map-container">
-        <canvas id="usCanvas"></canvas>
+        <canvas id="usCanvas" width="1024" height="500"></canvas>
     </div>
     <div class="button-group">
         <button id="resetBtn">🔄 PLAY AGAIN</button>
@@ -502,16 +498,14 @@
 <script>
     const canvas = document.getElementById('usCanvas');
     const ctx = canvas.getContext('2d');
+    canvas.width = 1024;
+    canvas.height = 500;
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
-    
     const DAILY_KEY = 'us_states_daily_v3';
-    
-    // CALIBRATED STATE POSITIONS - SET BY YOU
     const states = [
         ${stateData}
     ];
-    
     let currentRound = [];
     let currentIndex = 0;
     let currentState = null;
@@ -643,11 +637,11 @@
         const now = new Date();
         const month = now.toLocaleString('default', { month: 'short' });
         const day = now.getDate();
-        const dateString = `${month} ${day}`;
+        const dateString = \`\${month} \${day}\`;
         let scoreLine = "";
         for (let i = 0; i < questionPoints.length; i++) {
             let icon = getIconForPoints(questionPoints[i]);
-            scoreLine += `${questionPoints[i]}${icon} `;
+            scoreLine += \`\${questionPoints[i]}\${icon} \`;
         }
         scoreLine = scoreLine.trim();
         return \`https://ESA102.github.io/GameArcade/ \${dateString}\n\${scoreLine}\nFinal score: \${totalScore}\`;
@@ -763,14 +757,8 @@
         }
     }
     
-    // Set canvas size to match image
-    mapImage.onload = () => {
-        canvas.width = mapImage.width;
-        canvas.height = mapImage.height;
-        mapLoaded = true;
-        drawMap();
-        initGame();
-    };
+    mapImage.onload = () => { mapLoaded = true; drawMap(); initGame(); };
+    mapImage.onerror = () => { document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png"; };
     
     canvas.addEventListener('click', handleClick);
     document.getElementById('resetBtn').addEventListener('click', resetGame);
@@ -792,7 +780,7 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        alert('✅ Game file generated! Download "us_states_game.html" and upload it to GitHub as your main game file.');
+        alert('✅ Game file generated! Download "us_states_game.html" and upload it to GitHub.');
     }
     
     function resetCalibration() {
