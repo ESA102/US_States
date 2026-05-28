@@ -3,306 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>US States Calibration - Set Correct Positions</title>
-    <style>
-        * { user-select: none; box-sizing: border-box; }
-        body {
-            background: linear-gradient(145deg, #1a472a, #0e2a1a);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .game {
-            background: #f5f2e8;
-            border-radius: 30px;
-            padding: 20px;
-            max-width: 1100px;
-            width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .target {
-            background: #3b2a1f;
-            padding: 10px 25px;
-            border-radius: 50px;
-            color: white;
-            font-size: 1.3rem;
-        }
-        .map-container { text-align: center; margin: 15px 0; }
-        canvas {
-            display: inline-block;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            cursor: crosshair;
-            background: #c9b27c;
-            width: 100%;
-            height: auto;
-            border: 2px solid #c9b27c;
-        }
-        .button-group { display: flex; gap: 15px; margin: 15px 0 10px 0; justify-content: center; flex-wrap: wrap; }
-        button {
-            background: #d9a13b;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            color: #2c2b28;
-            min-width: 160px;
-        }
-        button:active { transform: scale(0.97); }
-        .message {
-            padding: 12px;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 1.1rem;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        .message-info { background: #e8e0c8; color: #2c2b28; border: 2px solid #c9b27c; }
-        .instruction { text-align: center; font-size: 0.9rem; color: #6b4c2c; margin-top: 5px; margin-bottom: 10px; }
-        .state-list {
-            background: #2c2b28;
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .state-item {
-            display: inline-block;
-            background: #4a3a2a;
-            color: white;
-            padding: 5px 10px;
-            margin: 3px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .state-item.calibrated {
-            background: #2f6b3c;
-        }
-        .state-item.selected {
-            background: #d9a13b;
-            color: #2c2b28;
-        }
-        .calibration-status {
-            background: #3b2a1f;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #ffd966;
-        }
-        @media (max-width: 700px) {
-            .state-item { font-size: 10px; padding: 3px 8px; }
-        }
-    </style>
-</head>
-<body>
-<div class="game">
-    <div class="header">
-        <div class="target">🔧 CALIBRATION MODE - Click states below, then click on map</div>
-    </div>
-    
-    <div class="map-container">
-        <canvas id="usCanvas" width="1024" height="500"></canvas>
-    </div>
-    
-    <div class="instruction">📍 Click on a state name below, then CLICK ON THE MAP where that state belongs</div>
-    
-    <div class="message message-info" id="message">Select a state, then click on the map to set its position</div>
-    
-    <div class="calibration-status" id="calibStatus">States calibrated: 0 / 50</div>
-    
-    <div class="state-list" id="stateList"></div>
-    
-    <div class="button-group">
-        <button id="saveBtn">💾 SAVE & PLAY GAME</button>
-        <button id="resetCalibBtn">🔄 RESET ALL</button>
-    </div>
-</div>
-
-<script>
-    const canvas = document.getElementById('usCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = 1024;
-    canvas.height = 500;
-    
-    const mapImage = new Image();
-    mapImage.src = 'blank_US_states.png';
-    
-    let mapLoaded = false;
-    
-    // All 50 states
-    const stateNames = [
-        "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
-        "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
-        "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi",
-        "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
-        "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania",
-        "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
-        "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
-    ];
-    
-    // Load saved positions
-    let states = [];
-    let currentSelected = null;
-    
-    function loadSaved() {
-        const saved = localStorage.getItem('us_states_calibrated');
-        if (saved) {
-            states = JSON.parse(saved);
-        } else {
-            states = stateNames.map(name => ({ name: name, x: null, y: null, set: false }));
-        }
-        updateUI();
-        drawMap();
-    }
-    
-    function savePositions() {
-        localStorage.setItem('us_states_calibrated', JSON.stringify(states));
-        alert('✅ Positions saved!');
-        updateUI();
-        drawMap();
-    }
-    
-    function updateUI() {
-        const setCount = states.filter(s => s.set).length;
-        document.getElementById('calibStatus').innerHTML = `States calibrated: ${setCount} / 50`;
-        
-        const container = document.getElementById('stateList');
-        container.innerHTML = '';
-        
-        states.forEach(state => {
-            const btn = document.createElement('span');
-            btn.className = `state-item ${state.set ? 'calibrated' : ''} ${currentSelected === state.name ? 'selected' : ''}`;
-            btn.innerHTML = `${state.name} ${state.set ? '✓' : ''}`;
-            btn.onclick = () => {
-                currentSelected = state.name;
-                updateUI();
-                document.getElementById('message').innerHTML = `📍 SELECTED: ${state.name} - Now click on the map where it belongs`;
-                drawMap();
-            };
-            container.appendChild(btn);
-        });
-        
-        drawMap();
-    }
-    
-    function drawMap(clickHintX = null, clickHintY = null) {
-        if (!mapLoaded) return;
-        
-        ctx.clearRect(0, 0, 1024, 500);
-        ctx.drawImage(mapImage, 0, 0, 1024, 500);
-        
-        // Draw all placed state markers
-        for (let state of states) {
-            if (state.set && state.x && state.y) {
-                ctx.beginPath();
-                ctx.arc(state.x, state.y, 8, 0, Math.PI * 2);
-                ctx.fillStyle = "#ff6600";
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(state.x, state.y, 4, 0, Math.PI * 2);
-                ctx.fillStyle = "#ffffff";
-                ctx.fill();
-                ctx.font = "10px Arial";
-                ctx.fillStyle = "#000000";
-                ctx.shadowBlur = 2;
-                ctx.shadowColor = "white";
-                ctx.fillText(state.name, state.x + 10, state.y - 4);
-                ctx.shadowBlur = 0;
-            }
-        }
-        
-        // Highlight selected state
-        if (currentSelected) {
-            const state = states.find(s => s.name === currentSelected);
-            if (state && state.set) {
-                ctx.beginPath();
-                ctx.arc(state.x, state.y, 14, 0, Math.PI * 2);
-                ctx.strokeStyle = "#00ff00";
-                ctx.lineWidth = 3;
-                ctx.stroke();
-            }
-        }
-        
-        // Show click hint
-        if (clickHintX && clickHintY) {
-            ctx.beginPath();
-            ctx.arc(clickHintX, clickHintY, 12, 0, Math.PI * 2);
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
-    }
-    
-    mapImage.onload = () => {
-        mapLoaded = true;
-        drawMap();
-    };
-    
-    mapImage.onerror = () => {
-        document.getElementById('message').innerHTML = "⚠️ Map image not found! Please upload blank_US_states.png";
-        document.getElementById('message').className = "message miss";
-    };
-    
-    function handleCanvasClick(e) {
-        if (!mapLoaded) return;
-        
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const clickX = (e.clientX - rect.left) * scaleX;
-        const clickY = (e.clientY - rect.top) * scaleY;
-        
-        if (currentSelected) {
-            const stateIndex = states.findIndex(s => s.name === currentSelected);
-            if (stateIndex !== -1) {
-                states[stateIndex].x = clickX;
-                states[stateIndex].y = clickY;
-                states[stateIndex].set = true;
-                savePositions();
-                updateUI();
-                drawMap(clickX, clickY);
-                document.getElementById('message').innerHTML = `✅ ${currentSelected} placed at (${Math.round(clickX)}, ${Math.round(clickY)})`;
-            }
-        } else {
-            document.getElementById('message').innerHTML = "⚠️ First select a state from the list above";
-        }
-    }
-    
-    function saveAndPlay() {
-        const unsetStates = states.filter(s => !s.set);
-        if (unsetStates.length > 0) {
-            alert(`Please place all states first!\nMissing: ${unsetStates.slice(0, 5).map(s => s.name).join(', ')}${unsetStates.length > 5 ? '...' : ''}`);
-            return;
-        }
-        
-        localStorage.setItem('us_states_calibrated', JSON.stringify(states));
-        
-        // Generate the game HTML
-        const stateData = states.map(s => `{ name: "${s.name}", x: ${Math.round(s.x)}, y: ${Math.round(s.y)} }`).join(',\n        ');
-        
-        const gameHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Daily US States Challenge</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <style>
@@ -425,6 +125,7 @@
             color: #d9a13b;
             margin-top: 5px;
         }
+        
         .daily-limit-overlay {
             position: fixed;
             top: 0;
@@ -440,7 +141,10 @@
             opacity: 0;
             transition: all 0.3s ease;
         }
-        .daily-limit-overlay.show { visibility: visible; opacity: 1; }
+        .daily-limit-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
         .daily-limit-content {
             background: #f5f2e8;
             border-radius: 30px;
@@ -449,13 +153,24 @@
             width: 90%;
             text-align: center;
         }
-        .daily-limit-content h2 { color: #8b3c2c; margin: 0 0 15px 0; }
-        .daily-limit-content p { color: #2c2b28; margin-bottom: 20px; }
-        .daily-limit-content button { background: #d9a13b; margin-top: 10px; }
+        .daily-limit-content h2 {
+            color: #8b3c2c;
+            margin: 0 0 15px 0;
+        }
+        .daily-limit-content p {
+            color: #2c2b28;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .daily-limit-content button {
+            background: #d9a13b;
+            margin-top: 10px;
+        }
         @media (max-width: 700px) {
             .state-name { font-size: 1.3rem; }
             .target { font-size: 1rem; }
             button { padding: 8px 16px; min-width: 120px; font-size: 0.9rem; }
+            .points-breakdown { font-size: 0.7rem; gap: 8px; }
         }
     </style>
 </head>
@@ -465,18 +180,23 @@
         <div class="score-box">🏆 SCORE: <span id="score">0</span> / 1000</div>
         <div class="target">🇺🇸 FIND: <span class="state-name" id="targetCity">Loading...</span></div>
     </div>
+    
     <div class="map-container">
-        <canvas id="usCanvas" width="1024" height="500"></canvas>
+        <canvas id="usCanvas"></canvas>
     </div>
+    
     <div class="button-group">
         <button id="resetBtn">🔄 PLAY AGAIN</button>
         <button id="nextBtn">➡️ NEXT STATE</button>
         <button id="shareBtn">📤 SHARE</button>
     </div>
+    
     <div class="instruction">📍 Click on the map where you think the state is located</div>
     <div class="daily-badge" id="dailyBadge">🎯 Daily Challenge: Same states for everyone today!</div>
+    
     <div class="message message-info" id="message">Ready! Click on the map to start</div>
     <div class="progress" id="progress">Question 1 of 5</div>
+    
     <div class="points-breakdown">
         <div>🎯 Within State Border: <span>200 pts</span></div>
         <div>👍 0-50km over: <span>160 pts</span></div>
@@ -486,6 +206,7 @@
         <div>❌ 200km+ over: <span>0 pts</span></div>
     </div>
 </div>
+
 <div class="daily-limit-overlay" id="dailyLimitOverlay">
     <div class="daily-limit-content">
         <h2>⏰ Daily Challenge Complete!</h2>
@@ -495,31 +216,53 @@
         <button id="closeDailyLimitBtn">OK</button>
     </div>
 </div>
+
 <script>
     const canvas = document.getElementById('usCanvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = 1024;
-    canvas.height = 500;
+    
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
-    const DAILY_KEY = 'us_states_daily_v3';
-    const states = [
-        ${stateData}
-    ];
-    let currentRound = [];
-    let currentIndex = 0;
-    let currentState = null;
-    let totalScore = 0;
-    let canClick = true;
+    
+    // CALIBRATED bounds based on your Utah click (49°, -138°)
+    // Utah should be at (39.3°, -111.7°)
+    // Offset applied to all states
+    const NORTH = 52.0;
+    const SOUTH = 35.0;
+    const WEST = -151.0;
+    const EAST = -86.0;
+    
+    let CANVAS_W = 0;
+    let CANVAS_H = 0;
     let mapLoaded = false;
-    let gameActive = true;
-    let answered = false;
-    let showMarkers = false;
-    let clickPos = null;
-    let correctPos = null;
-    let questionPoints = [];
-    let questionIcons = [];
-    let gameStarted = false;
+    let latToY, lonToX, pixelToLatLon;
+    
+    const DAILY_KEY = 'us_states_daily_v4';
+    
+    // State areas for radius calculation
+    const stateAreas = {
+        "Alabama": 50645, "Alaska": 570641, "Arizona": 113594, "Arkansas": 52035,
+        "California": 155779, "Colorado": 103642, "Connecticut": 4842, "Delaware": 1949,
+        "Florida": 53625, "Georgia": 57513, "Hawaii": 6423, "Idaho": 82643,
+        "Illinois": 55519, "Indiana": 35826, "Iowa": 55857, "Kansas": 81759,
+        "Kentucky": 39486, "Louisiana": 43204, "Maine": 30843, "Maryland": 9707,
+        "Massachusetts": 7800, "Michigan": 56539, "Minnesota": 79627, "Mississippi": 46923,
+        "Missouri": 68742, "Montana": 145546, "Nebraska": 76824, "Nevada": 109781,
+        "New Hampshire": 7788, "New Jersey": 7414, "New Mexico": 121312, "New York": 47126,
+        "North Carolina": 48612, "North Dakota": 69116, "Ohio": 40861, "Oklahoma": 68767,
+        "Oregon": 95988, "Pennsylvania": 44743, "Rhode Island": 1034, "South Carolina": 30061,
+        "South Dakota": 75811, "Tennessee": 41235, "Texas": 261232, "Utah": 82169,
+        "Vermont": 9238, "Virginia": 39490, "Washington": 66456, "West Virginia": 24038,
+        "Wisconsin": 54314, "Wyoming": 97093
+    };
+    
+    function getStateRadiusKm(stateName) {
+        const areaSqMi = stateAreas[stateName];
+        if (!areaSqMi) return 70;
+        const areaSqKm = areaSqMi * 2.58999;
+        const radiusKm = Math.sqrt(areaSqKm / Math.PI);
+        return Math.min(150, Math.max(25, Math.round(radiusKm)));
+    }
     
     function getDailySeed() {
         const today = new Date();
@@ -543,17 +286,177 @@
         return arr;
     }
     
-    function getDailyStates() {
-        const seed = getDailySeed();
-        const shuffled = seededShuffle([...states], seed);
-        return shuffled.slice(0, 5);
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
     }
     
-    function haversineDistance(clickX, clickY, correctX, correctY) {
-        const dx = clickX - correctX;
-        const dy = clickY - correctY;
-        const pixelDist = Math.sqrt(dx*dx + dy*dy);
-        return pixelDist * 4.5;
+    // State coordinates - Geographic centers
+    const states = [
+        { name: "Alabama", lat: 32.8065, lon: -86.7911 },
+        { name: "Alaska", lat: 61.3707, lon: -152.4044 },
+        { name: "Arizona", lat: 34.2744, lon: -111.6602 },
+        { name: "Arkansas", lat: 34.9697, lon: -92.3731 },
+        { name: "California", lat: 36.7783, lon: -119.4179 },
+        { name: "Colorado", lat: 39.0598, lon: -105.3111 },
+        { name: "Connecticut", lat: 41.6032, lon: -72.0877 },
+        { name: "Delaware", lat: 38.9108, lon: -75.5277 },
+        { name: "Florida", lat: 27.9944, lon: -81.7603 },
+        { name: "Georgia", lat: 32.6415, lon: -83.4426 },
+        { name: "Hawaii", lat: 20.2927, lon: -156.3737 },
+        { name: "Idaho", lat: 44.2405, lon: -114.4788 },
+        { name: "Illinois", lat: 40.3495, lon: -88.9861 },
+        { name: "Indiana", lat: 39.8942, lon: -86.2816 },
+        { name: "Iowa", lat: 41.8780, lon: -93.0977 },
+        { name: "Kansas", lat: 38.5266, lon: -96.7265 },
+        { name: "Kentucky", lat: 37.6681, lon: -84.6701 },
+        { name: "Louisiana", lat: 30.3918, lon: -92.3291 },
+        { name: "Maine", lat: 44.6939, lon: -69.3819 },
+        { name: "Maryland", lat: 39.0639, lon: -76.8021 },
+        { name: "Massachusetts", lat: 42.2302, lon: -71.5301 },
+        { name: "Michigan", lat: 43.3265, lon: -84.5361 },
+        { name: "Minnesota", lat: 46.3925, lon: -94.6362 },
+        { name: "Mississippi", lat: 32.7416, lon: -89.6787 },
+        { name: "Missouri", lat: 38.4561, lon: -92.2884 },
+        { name: "Montana", lat: 46.9219, lon: -110.4544 },
+        { name: "Nebraska", lat: 41.1254, lon: -98.2681 },
+        { name: "Nevada", lat: 38.3135, lon: -117.0554 },
+        { name: "New Hampshire", lat: 43.4525, lon: -71.5639 },
+        { name: "New Jersey", lat: 40.2989, lon: -74.5210 },
+        { name: "New Mexico", lat: 34.8405, lon: -106.2485 },
+        { name: "New York", lat: 42.7654, lon: -74.9105 },
+        { name: "North Carolina", lat: 35.5557, lon: -79.3878 },
+        { name: "North Dakota", lat: 47.5289, lon: -99.7840 },
+        { name: "Ohio", lat: 40.3888, lon: -82.7649 },
+        { name: "Oklahoma", lat: 35.5653, lon: -96.9289 },
+        { name: "Oregon", lat: 44.5725, lon: -122.0709 },
+        { name: "Pennsylvania", lat: 40.8781, lon: -77.7996 },
+        { name: "Rhode Island", lat: 41.6762, lon: -71.5562 },
+        { name: "South Carolina", lat: 33.8569, lon: -80.9450 },
+        { name: "South Dakota", lat: 44.2998, lon: -99.4388 },
+        { name: "Tennessee", lat: 35.7478, lon: -86.6923 },
+        { name: "Texas", lat: 31.0545, lon: -97.5635 },
+        { name: "Utah", lat: 39.3056, lon: -111.6703 },
+        { name: "Vermont", lat: 43.8710, lon: -72.6327 },
+        { name: "Virginia", lat: 37.7693, lon: -78.1697 },
+        { name: "Washington", lat: 47.4009, lon: -121.4905 },
+        { name: "West Virginia", lat: 38.4912, lon: -80.9545 },
+        { name: "Wisconsin", lat: 44.7866, lon: -89.4134 },
+        { name: "Wyoming", lat: 42.9966, lon: -107.5526 }
+    ];
+    
+    let statesWithPos = [];
+    let currentRound = [];
+    let currentIndex = 0;
+    let currentState = null;
+    let totalScore = 0;
+    let canClick = true;
+    let gameActive = true;
+    let answered = false;
+    let showMarkers = false;
+    let clickPos = null;
+    let correctPos = null;
+    let questionPoints = [];
+    let questionIcons = [];
+    let gameStarted = false;
+    
+    function calculatePoints(distanceKm, stateName) {
+        const stateRadius = getStateRadiusKm(stateName);
+        if (distanceKm <= stateRadius) return 200;
+        const over = distanceKm - stateRadius;
+        if (over <= 50) return 160;
+        if (over <= 100) return 120;
+        if (over <= 150) return 80;
+        if (over <= 200) return 40;
+        return 0;
+    }
+    
+    function getGradeText(distanceKm, stateName) {
+        const stateRadius = getStateRadiusKm(stateName);
+        if (distanceKm <= stateRadius) return `🎯 PERFECT! +200`;
+        const over = distanceKm - stateRadius;
+        if (over <= 50) return `👍 EXCELLENT! +160`;
+        if (over <= 100) return `✅ VERY GOOD! +120`;
+        if (over <= 150) return `📌 GOOD! +80`;
+        if (over <= 200) return `🔍 NOT BAD +40`;
+        return `❌ MISS +0`;
+    }
+    
+    function getIconForPoints(points) {
+        if (points >= 190) return "🏅";
+        if (points >= 160) return "🏆";
+        if (points >= 120) return "⭐";
+        if (points >= 80) return "👍";
+        return "💪";
+    }
+    
+    function getShareMessage() {
+        const now = new Date();
+        const month = now.toLocaleString('default', { month: 'short' });
+        const day = now.getDate();
+        const dateString = `${month} ${day}`;
+        let scoreLine = "";
+        for (let i = 0; i < questionPoints.length; i++) {
+            let icon = getIconForPoints(questionPoints[i]);
+            scoreLine += `${questionPoints[i]}${icon} `;
+        }
+        scoreLine = scoreLine.trim();
+        return `https://ESA102.github.io/GameArcade/ ${dateString}\n${scoreLine}\nFinal score: ${totalScore}`;
+    }
+    
+    function shareScore() {
+        const message = getShareMessage();
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                         || (navigator.maxTouchPoints > 0 && /Macintosh/.test(navigator.userAgent));
+        if (isMobile && navigator.share) {
+            navigator.share({ title: 'My US States Challenge Score', text: message }).catch(() => { copyToClipboardFallback(message); });
+        } else {
+            copyToClipboardFallback(message);
+        }
+    }
+    
+    function copyToClipboardFallback(message) {
+        navigator.clipboard.writeText(message).then(() => {
+            const msgDiv = document.getElementById('message');
+            if (!msgDiv) return;
+            const originalText = msgDiv.innerHTML;
+            msgDiv.innerHTML = "📋 Score copied to clipboard!";
+            msgDiv.className = "message message-info";
+            setTimeout(() => {
+                if (gameActive) { msgDiv.innerHTML = originalText; }
+                else { msgDiv.innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`; }
+            }, 2000);
+        }).catch(() => {});
+    }
+    
+    function drawMap() {
+        if (!mapLoaded) return;
+        ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+        ctx.drawImage(mapImage, 0, 0, CANVAS_W, CANVAS_H);
+        if (showMarkers) {
+            if (clickPos) {
+                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = "white"; ctx.fill();
+                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
+                ctx.strokeStyle = "black"; ctx.lineWidth = 2; ctx.stroke();
+            }
+            if (correctPos) {
+                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
+                ctx.fillStyle = "#33ff33"; ctx.fill();
+                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
+                ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
+                if (clickPos) {
+                    ctx.beginPath(); ctx.moveTo(clickPos.x, clickPos.y); ctx.lineTo(correctPos.x, correctPos.y);
+                    ctx.strokeStyle = "#ffaa33"; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); ctx.stroke(); ctx.setLineDash([]);
+                }
+            }
+        }
     }
     
     function checkDailyLimit() {
@@ -580,103 +483,17 @@
         document.getElementById('dailyLimitOverlay').classList.remove('show');
     }
     
-    function drawMap() {
-        if (!mapLoaded) return;
-        ctx.clearRect(0, 0, 1024, 500);
-        ctx.drawImage(mapImage, 0, 0, 1024, 500);
-        if (showMarkers) {
-            if (clickPos) {
-                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
-                ctx.fillStyle = "white"; ctx.fill();
-                ctx.beginPath(); ctx.arc(clickPos.x, clickPos.y, 12, 0, Math.PI * 2);
-                ctx.strokeStyle = "black"; ctx.lineWidth = 2; ctx.stroke();
-            }
-            if (correctPos) {
-                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
-                ctx.fillStyle = "#33ff33"; ctx.fill();
-                ctx.beginPath(); ctx.arc(correctPos.x, correctPos.y, 14, 0, Math.PI * 2);
-                ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
-                if (clickPos) {
-                    ctx.beginPath(); ctx.moveTo(clickPos.x, clickPos.y); ctx.lineTo(correctPos.x, correctPos.y);
-                    ctx.strokeStyle = "#ffaa33"; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); ctx.stroke(); ctx.setLineDash([]);
-                }
-            }
-        }
-    }
-    
-    mapImage.onload = () => { mapLoaded = true; drawMap(); };
-    mapImage.onerror = () => { document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png"; };
-    
-    function calculatePoints(distanceKm) {
-        if (distanceKm <= 60) return 200;
-        if (distanceKm <= 80) return 160;
-        if (distanceKm <= 100) return 120;
-        if (distanceKm <= 150) return 80;
-        if (distanceKm <= 300) return 40;
-        return 0;
-    }
-    
-    function getGradeText(distanceKm) {
-        if (distanceKm <= 60) return "🎯 PERFECT! +200";
-        if (distanceKm <= 80) return "👍 EXCELLENT! +160";
-        if (distanceKm <= 100) return "✅ VERY GOOD! +120";
-        if (distanceKm <= 150) return "📌 GOOD! +80";
-        if (distanceKm <= 300) return "🔍 NOT BAD +40";
-        return "❌ MISS +0";
-    }
-    
-    function getIconForPoints(points) {
-        if (points >= 190) return "🏅";
-        if (points >= 160) return "🏆";
-        if (points >= 120) return "⭐";
-        if (points >= 80) return "👍";
-        return "💪";
-    }
-    
-    function getShareMessage() {
-        const now = new Date();
-        const month = now.toLocaleString('default', { month: 'short' });
-        const day = now.getDate();
-        const dateString = \`\${month} \${day}\`;
-        let scoreLine = "";
-        for (let i = 0; i < questionPoints.length; i++) {
-            let icon = getIconForPoints(questionPoints[i]);
-            scoreLine += \`\${questionPoints[i]}\${icon} \`;
-        }
-        scoreLine = scoreLine.trim();
-        return \`https://ESA102.github.io/GameArcade/ \${dateString}\n\${scoreLine}\nFinal score: \${totalScore}\`;
-    }
-    
-    function shareScore() {
-        const message = getShareMessage();
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                         || (navigator.maxTouchPoints > 0 && /Macintosh/.test(navigator.userAgent));
-        if (isMobile && navigator.share) {
-            navigator.share({ title: 'My US States Challenge Score', text: message }).catch(() => { copyToClipboardFallback(message); });
-        } else {
-            copyToClipboardFallback(message);
-        }
-    }
-    
-    function copyToClipboardFallback(message) {
-        navigator.clipboard.writeText(message).then(() => {
-            const msgDiv = document.getElementById('message');
-            if (!msgDiv) return;
-            const originalText = msgDiv.innerHTML;
-            msgDiv.innerHTML = "📋 Score copied to clipboard!";
-            msgDiv.className = "message message-info";
-            setTimeout(() => {
-                if (gameActive) { msgDiv.innerHTML = originalText; }
-                else { msgDiv.innerHTML = \`🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: \${totalScore} / 1000 ⭐\`; }
-            }, 2000);
-        }).catch(() => {});
+    function getDailyStates() {
+        const seed = getDailySeed();
+        const shuffled = seededShuffle([...statesWithPos], seed);
+        return shuffled.slice(0, 5);
     }
     
     function endGame() {
         gameActive = false;
         saveDailyScore(totalScore);
         document.getElementById('message').className = "message game-complete";
-        document.getElementById('message').innerHTML = \`🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: \${totalScore} / 1000 ⭐\`;
+        document.getElementById('message').innerHTML = `🎉 GAME COMPLETE! 🎉<br>⭐ Final Score: ${totalScore} / 1000 ⭐`;
         document.getElementById('progress').innerHTML = "🏁 Come back tomorrow for a new challenge! 🏁";
         document.getElementById('nextBtn').style.display = "none";
         document.getElementById('shareBtn').style.display = "block";
@@ -690,7 +507,7 @@
         correctPos = null;
         currentState = currentRound[currentIndex];
         document.getElementById('targetCity').innerText = currentState.name;
-        document.getElementById('progress').innerHTML = \`📍 Question \${currentIndex + 1} of \${currentRound.length}\`;
+        document.getElementById('progress').innerHTML = `📍 Question ${currentIndex + 1} of ${currentRound.length}`;
         document.getElementById('message').className = "message message-info";
         document.getElementById('message').innerHTML = "Click on the map!";
         drawMap();
@@ -706,19 +523,23 @@
         const scaleY = canvas.height / rect.height;
         const userX = (e.clientX - rect.left) * scaleX;
         const userY = (e.clientY - rect.top) * scaleY;
-        const distanceKm = haversineDistance(userX, userY, currentState.x, currentState.y);
-        const points = calculatePoints(distanceKm);
+        const clickLatLon = pixelToLatLon(userX, userY);
+        const distanceKm = haversineDistance(clickLatLon.lat, clickLatLon.lon, currentState.lat, currentState.lon);
+        const points = calculatePoints(distanceKm, currentState.name);
         totalScore += points;
         questionPoints[currentIndex] = points;
         questionIcons[currentIndex] = getIconForPoints(points);
         document.getElementById('score').innerText = totalScore;
         const msgDiv = document.getElementById('message');
         let gradeClass = "miss";
-        if (distanceKm <= 60) gradeClass = "perfect";
-        else if (distanceKm <= 100) gradeClass = "good";
-        else if (distanceKm <= 300) gradeClass = "close";
-        msgDiv.className = \`message \${gradeClass}\`;
-        msgDiv.innerHTML = \`\${getGradeText(distanceKm)}\`;
+        const stateRadius = getStateRadiusKm(currentState.name);
+        if (distanceKm <= stateRadius) gradeClass = "perfect";
+        else if (distanceKm <= stateRadius + 50) gradeClass = "perfect";
+        else if (distanceKm <= stateRadius + 100) gradeClass = "good";
+        else if (distanceKm <= stateRadius + 150) gradeClass = "good";
+        else if (distanceKm <= stateRadius + 200) gradeClass = "close";
+        msgDiv.className = `message ${gradeClass}`;
+        msgDiv.innerHTML = `${getGradeText(distanceKm, currentState.name)}`;
         showMarkers = true;
         clickPos = { x: userX, y: userY };
         correctPos = { x: currentState.x, y: currentState.y };
@@ -739,6 +560,10 @@
     }
     
     function initGame() {
+        statesWithPos = states.map(state => ({
+            name: state.name, lat: state.lat, lon: state.lon,
+            x: lonToX(state.lon), y: latToY(state.lat)
+        }));
         const dailyCheck = checkDailyLimit();
         if (!dailyCheck.allowed) {
             showDailyLimitOverlay(dailyCheck.score);
@@ -752,50 +577,38 @@
             gameStarted = true;
             currentRound = getDailyStates();
             const stateNames = currentRound.map(s => s.name).join(', ');
-            document.getElementById('dailyBadge').innerHTML = \`🎯 Daily Challenge: \${stateNames}\`;
+            document.getElementById('dailyBadge').innerHTML = `🎯 Daily Challenge: ${stateNames}`;
             loadNext();
         }
     }
     
-    mapImage.onload = () => { mapLoaded = true; drawMap(); initGame(); };
-    mapImage.onerror = () => { document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png"; };
+    mapImage.onload = () => {
+        CANVAS_W = mapImage.width;
+        CANVAS_H = mapImage.height;
+        canvas.width = CANVAS_W;
+        canvas.height = CANVAS_H;
+        
+        latToY = (lat) => ((NORTH - lat) / (NORTH - SOUTH)) * CANVAS_H;
+        lonToX = (lon) => ((lon - WEST) / (EAST - WEST)) * CANVAS_W;
+        pixelToLatLon = (x, y) => ({
+            lat: NORTH - (y / CANVAS_H) * (NORTH - SOUTH),
+            lon: WEST + (x / CANVAS_W) * (EAST - WEST)
+        });
+        
+        mapLoaded = true;
+        drawMap();
+        initGame();
+    };
+    
+    mapImage.onerror = () => { 
+        document.getElementById('message').innerHTML = "⚠️ Upload blank_US_states.png"; 
+    };
     
     canvas.addEventListener('click', handleClick);
     document.getElementById('resetBtn').addEventListener('click', resetGame);
     document.getElementById('nextBtn').addEventListener('click', nextState);
     document.getElementById('shareBtn').addEventListener('click', shareScore);
     document.getElementById('closeDailyLimitBtn').addEventListener('click', closeDailyLimitOverlay);
-</script>
-</body>
-</html>`;
-        
-        // Download the game file
-        const blob = new Blob([gameHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'us_states_game.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        alert('✅ Game file generated! Download "us_states_game.html" and upload it to GitHub.');
-    }
-    
-    function resetCalibration() {
-        if (confirm('Reset ALL state positions? This will erase your saved data.')) {
-            localStorage.removeItem('us_states_calibrated');
-            loadSaved();
-            drawMap();
-        }
-    }
-    
-    canvas.addEventListener('click', handleCanvasClick);
-    document.getElementById('saveBtn').addEventListener('click', saveAndPlay);
-    document.getElementById('resetCalibBtn').addEventListener('click', resetCalibration);
-    
-    loadSaved();
 </script>
 </body>
 </html>
