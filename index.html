@@ -99,7 +99,7 @@
     <div class="daily-badge" id="dailyBadge">🎯 Daily Challenge: Same states for everyone today!</div>
     <div class="message message-info" id="message">Ready! Click on the map to start</div>
     <div class="progress" id="progress">Question 1 of 5</div>
-    <div class="points-breakdown"><div>🎯 Inside State: <span>200 pts</span></div><div>👍 Very Close: <span>180 pts</span></div><div>✅ Close: <span>150 pts</span></div><div>📌 Nearby: <span>100 pts</span></div><div>🔍 Region: <span>50 pts</span></div><div>❌ Too Far: <span>0 pts</span></div></div>
+    <div class="points-breakdown"><div>🎯 Bullseye: <span>200 pts</span></div><div>✅ Inside State: <span>180 pts</span></div><div>👍 Close: <span>150 pts</span></div><div>📌 Nearby: <span>100 pts</span></div><div>🔍 Region: <span>50 pts</span></div><div>❌ Too Far: <span>0 pts</span></div></div>
 </div>
 <div class="daily-limit-overlay" id="dailyLimitOverlay"><div class="daily-limit-content"><h2>⏰ Daily Challenge Complete!</h2><p>You've already played today's challenge.</p><p>Come back tomorrow for a new challenge!</p><p>⭐ Your score today: <span id="todaysScore">0</span> / 1000 ⭐</p><button id="closeDailyLimitBtn">OK</button></div></div>
 
@@ -109,7 +109,7 @@
     const mapImage = new Image();
     mapImage.src = 'blank_US_states.png';
 
-    // YOUR CALIBRATED COORDINATES - preserved exactly as you clicked them
+    // YOUR CALIBRATED COORDINATES
     const statesData = [
         { "name": "Washington", "x": 614, "y": 264 },
         { "name": "Oregon", "x": 533, "y": 470 },
@@ -162,6 +162,20 @@
         { "name": "Alaska", "x": 383, "y": 1462 },
         { "name": "Hawaii", "x": 1223, "y": 1816 }
     ];
+
+    // State sizes in pixels (radius from center point)
+    const stateSizes = {
+        "Texas": 280, "California": 200, "Montana": 220, "Alaska": 350,
+        "New Mexico": 170, "Arizona": 170, "Nevada": 180, "Colorado": 160,
+        "Oregon": 160, "Wyoming": 160, "Idaho": 160, "Utah": 150,
+        "Minnesota": 180, "Michigan": 170, "Florida": 160, "Georgia": 140,
+        "North Carolina": 140, "Virginia": 130, "Pennsylvania": 130,
+        "New York": 150, "Maine": 170, "Washington": 150, "default": 120
+    };
+
+    function getStateSize(stateName) {
+        return stateSizes[stateName] || stateSizes.default;
+    }
 
     let currentRound = [], currentIndex = 0, currentState = null, totalScore = 0, canClick = true, mapLoaded = false, gameActive = true, answered = false, showMarkers = false, clickPos = null, correctPos = null, questionPoints = [], questionIcons = [], gameStarted = false;
     
@@ -226,23 +240,29 @@
         return pixelDist * 4.0; 
     }
     
-    // NEW MORE TOLERANT SCORING SYSTEM
-    function calculatePoints(distanceKm) { 
-        if (distanceKm <= 150) return 200;      // Clicked inside the state
-        if (distanceKm <= 250) return 180;      // Very close
-        if (distanceKm <= 350) return 150;      // Close
-        if (distanceKm <= 500) return 100;      // Nearby
-        if (distanceKm <= 800) return 50;       // In the region
+    // SIZE-BASED SCORING
+    function calculatePointsForState(distanceKm, stateName) {
+        const stateSize = getStateSize(stateName);
+        const percentage = Math.max(0, 100 - (distanceKm / stateSize) * 100);
+        
+        if (percentage >= 95) return 200;
+        if (percentage >= 80) return 180;
+        if (percentage >= 60) return 150;
+        if (percentage >= 40) return 100;
+        if (percentage >= 20) return 50;
         return 0;
     }
     
-    function getGradeText(distanceKm) { 
-        if (distanceKm <= 150) return "🎯 PERFECT! +200 (Inside the state!)";
-        if (distanceKm <= 250) return "👍 VERY GOOD! +180";
-        if (distanceKm <= 350) return "✅ GOOD! +150";
-        if (distanceKm <= 500) return "📌 NOT BAD! +100";
-        if (distanceKm <= 800) return "🔍 CLOSE! +50";
-        return "❌ MISS +0 (Better luck next state)";
+    function getGradeTextForState(distanceKm, stateName) {
+        const stateSize = getStateSize(stateName);
+        const percentage = Math.max(0, 100 - (distanceKm / stateSize) * 100);
+        
+        if (percentage >= 95) return "🎯 BULLSEYE! +200";
+        if (percentage >= 80) return "✅ INSIDE STATE! +180";
+        if (percentage >= 60) return "👍 GOOD CLICK! +150";
+        if (percentage >= 40) return "📌 CLOSE! +100";
+        if (percentage >= 20) return "🔍 NEARBY! +50";
+        return "❌ MISS +0";
     }
     
     function getIconForPoints(points) { 
@@ -332,19 +352,19 @@
         const clickX = (e.clientX - rect.left) * scaleX;
         const clickY = (e.clientY - rect.top) * scaleY;
         const distanceKm = haversineDistance(clickX, clickY, currentState.x, currentState.y);
-        const points = calculatePoints(distanceKm);
+        const points = calculatePointsForState(distanceKm, currentState.name);
         totalScore += points;
         questionPoints[currentIndex] = points;
         questionIcons[currentIndex] = getIconForPoints(points);
         document.getElementById('score').innerText = totalScore;
         const msgDiv = document.getElementById('message');
         let gradeClass = "miss";
-        if (distanceKm <= 150) gradeClass = "perfect";
-        else if (distanceKm <= 350) gradeClass = "good";
-        else if (distanceKm <= 500) gradeClass = "close";
-        else if (distanceKm <= 800) gradeClass = "far";
+        if (points >= 180) gradeClass = "perfect";
+        else if (points >= 150) gradeClass = "good";
+        else if (points >= 100) gradeClass = "close";
+        else if (points >= 50) gradeClass = "far";
         msgDiv.className = `message ${gradeClass}`;
-        msgDiv.innerHTML = `${getGradeText(distanceKm)}`;
+        msgDiv.innerHTML = `${getGradeTextForState(distanceKm, currentState.name)} (${Math.round(distanceKm)}km)`;
         showMarkers = true;
         clickPos = { x: clickX, y: clickY };
         correctPos = { x: currentState.x, y: currentState.y };
