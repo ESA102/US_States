@@ -99,7 +99,7 @@
     <div class="daily-badge" id="dailyBadge">🎯 Daily Challenge: Same states for everyone today!</div>
     <div class="message message-info" id="message">Ready! Click on the map to start</div>
     <div class="progress" id="progress">Question 1 of 5</div>
-    <div class="points-breakdown"><div>🎯 Bullseye: <span>200 pts</span></div><div>✅ Inside State: <span>180 pts</span></div><div>👍 Close: <span>150 pts</span></div><div>📌 Nearby: <span>100 pts</span></div><div>🔍 Region: <span>50 pts</span></div><div>❌ Too Far: <span>0 pts</span></div></div>
+    <div class="points-breakdown"><div>🎯 Hit (within region): <span>200 pts</span></div><div>👍 Great Guess: <span>180 pts</span></div><div>✅ Good: <span>150 pts</span></div><div>📌 Close: <span>100 pts</span></div><div>🔍 Nearby: <span>50 pts</span></div><div>❌ Too Far: <span>0 pts</span></div></div>
 </div>
 <div class="daily-limit-overlay" id="dailyLimitOverlay"><div class="daily-limit-content"><h2>⏰ Daily Challenge Complete!</h2><p>You've already played today's challenge.</p><p>Come back tomorrow for a new challenge!</p><p>⭐ Your score today: <span id="todaysScore">0</span> / 1000 ⭐</p><button id="closeDailyLimitBtn">OK</button></div></div>
 
@@ -163,14 +163,14 @@
         { "name": "Hawaii", "x": 1223, "y": 1816 }
     ];
 
-    // State sizes in pixels (radius from center point)
+    // State sizes in km (approximate radius)
     const stateSizes = {
-        "Texas": 280, "California": 200, "Montana": 220, "Alaska": 350,
-        "New Mexico": 170, "Arizona": 170, "Nevada": 180, "Colorado": 160,
-        "Oregon": 160, "Wyoming": 160, "Idaho": 160, "Utah": 150,
-        "Minnesota": 180, "Michigan": 170, "Florida": 160, "Georgia": 140,
-        "North Carolina": 140, "Virginia": 130, "Pennsylvania": 130,
-        "New York": 150, "Maine": 170, "Washington": 150, "default": 120
+        "Texas": 350, "California": 250, "Montana": 280, "Alaska": 450,
+        "New Mexico": 220, "Arizona": 220, "Nevada": 230, "Colorado": 200,
+        "Oregon": 200, "Wyoming": 200, "Idaho": 200, "Utah": 190,
+        "Minnesota": 230, "Michigan": 220, "Florida": 200, "Georgia": 180,
+        "North Carolina": 170, "Virginia": 160, "Pennsylvania": 160,
+        "New York": 190, "Maine": 210, "Washington": 190, "default": 150
     };
 
     function getStateSize(stateName) {
@@ -240,29 +240,37 @@
         return pixelDist * 4.0; 
     }
     
-    // SIZE-BASED SCORING
+    // MERCIFUL SCORING - Rewards effort, not just accuracy
     function calculatePointsForState(distanceKm, stateName) {
         const stateSize = getStateSize(stateName);
-        const percentage = Math.max(0, 100 - (distanceKm / stateSize) * 100);
         
-        if (percentage >= 95) return 200;
-        if (percentage >= 80) return 180;
-        if (percentage >= 60) return 150;
-        if (percentage >= 40) return 100;
-        if (percentage >= 20) return 50;
+        // You get FULL POINTS if you click ANYWHERE within the state's general area
+        // State sizes are now DOUBLED for forgiveness
+        const forgivingSize = stateSize * 2;
+        
+        if (distanceKm <= forgivingSize) return 200;
+        
+        // Gradual falloff - much wider bands
+        const extra = distanceKm - forgivingSize;
+        if (extra <= 150) return 180;   // Up to 150km outside state region
+        if (extra <= 300) return 150;   // Up to 300km outside
+        if (extra <= 500) return 100;   // Up to 500km outside
+        if (extra <= 800) return 50;    // Up to 800km outside
         return 0;
     }
     
     function getGradeTextForState(distanceKm, stateName) {
         const stateSize = getStateSize(stateName);
-        const percentage = Math.max(0, 100 - (distanceKm / stateSize) * 100);
+        const forgivingSize = stateSize * 2;
         
-        if (percentage >= 95) return "🎯 BULLSEYE! +200";
-        if (percentage >= 80) return "✅ INSIDE STATE! +180";
-        if (percentage >= 60) return "👍 GOOD CLICK! +150";
-        if (percentage >= 40) return "📌 CLOSE! +100";
-        if (percentage >= 20) return "🔍 NEARBY! +50";
-        return "❌ MISS +0";
+        if (distanceKm <= forgivingSize) return "🎯 HIT! +200 (You found it!)";
+        
+        const extra = distanceKm - forgivingSize;
+        if (extra <= 150) return "👍 GREAT GUESS! +180";
+        if (extra <= 300) return "✅ GOOD! +150";
+        if (extra <= 500) return "📌 CLOSE! +100";
+        if (extra <= 800) return "🔍 NEARBY! +50";
+        return "❌ MISS +0 (Better luck next time!)";
     }
     
     function getIconForPoints(points) { 
