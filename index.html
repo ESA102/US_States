@@ -99,7 +99,7 @@
     <div class="daily-badge" id="dailyBadge">🎯 Daily Challenge: Same states for everyone today!</div>
     <div class="message message-info" id="message">Ready! Click on the map to start</div>
     <div class="progress" id="progress">Question 1 of 5</div>
-    <div class="points-breakdown"><div>🎯 0-80km: <span>200 pts</span></div><div>👍 81-120km: <span>160 pts</span></div><div>✅ 121-180km: <span>120 pts</span></div><div>📌 181-250km: <span>80 pts</span></div><div>🔍 251-350km: <span>40 pts</span></div><div>❌ 350km+: <span>0 pts</span></div></div>
+    <div class="points-breakdown"><div>🎯 Inside State: <span>200 pts</span></div><div>👍 Very Close: <span>180 pts</span></div><div>✅ Close: <span>150 pts</span></div><div>📌 Nearby: <span>100 pts</span></div><div>🔍 Region: <span>50 pts</span></div><div>❌ Too Far: <span>0 pts</span></div></div>
 </div>
 <div class="daily-limit-overlay" id="dailyLimitOverlay"><div class="daily-limit-content"><h2>⏰ Daily Challenge Complete!</h2><p>You've already played today's challenge.</p><p>Come back tomorrow for a new challenge!</p><p>⭐ Your score today: <span id="todaysScore">0</span> / 1000 ⭐</p><button id="closeDailyLimitBtn">OK</button></div></div>
 
@@ -211,7 +211,6 @@
     }
     
     mapImage.onload = () => { 
-        // Set canvas to the actual image dimensions (this is correct)
         canvas.width = mapImage.width;
         canvas.height = mapImage.height;
         mapLoaded = true; 
@@ -227,22 +226,23 @@
         return pixelDist * 4.0; 
     }
     
+    // NEW MORE TOLERANT SCORING SYSTEM
     function calculatePoints(distanceKm) { 
-        if (distanceKm <= 80) return 200; 
-        if (distanceKm <= 120) return 160; 
-        if (distanceKm <= 180) return 120; 
-        if (distanceKm <= 250) return 80; 
-        if (distanceKm <= 350) return 40; 
-        return 0; 
+        if (distanceKm <= 150) return 200;      // Clicked inside the state
+        if (distanceKm <= 250) return 180;      // Very close
+        if (distanceKm <= 350) return 150;      // Close
+        if (distanceKm <= 500) return 100;      // Nearby
+        if (distanceKm <= 800) return 50;       // In the region
+        return 0;
     }
     
     function getGradeText(distanceKm) { 
-        if (distanceKm <= 80) return "🎯 PERFECT! +200"; 
-        if (distanceKm <= 120) return "👍 EXCELLENT! +160"; 
-        if (distanceKm <= 180) return "✅ VERY GOOD! +120"; 
-        if (distanceKm <= 250) return "📌 GOOD! +80"; 
-        if (distanceKm <= 350) return "🔍 NOT BAD +40"; 
-        return "❌ MISS +0"; 
+        if (distanceKm <= 150) return "🎯 PERFECT! +200 (Inside the state!)";
+        if (distanceKm <= 250) return "👍 VERY GOOD! +180";
+        if (distanceKm <= 350) return "✅ GOOD! +150";
+        if (distanceKm <= 500) return "📌 NOT BAD! +100";
+        if (distanceKm <= 800) return "🔍 CLOSE! +50";
+        return "❌ MISS +0 (Better luck next state)";
     }
     
     function getIconForPoints(points) { 
@@ -250,7 +250,8 @@
         if (points >= 160) return "🏆"; 
         if (points >= 120) return "⭐"; 
         if (points >= 80) return "👍"; 
-        return "💪"; 
+        if (points >= 40) return "💪";
+        return "😢"; 
     }
     
     function getShareMessage() { 
@@ -338,9 +339,10 @@
         document.getElementById('score').innerText = totalScore;
         const msgDiv = document.getElementById('message');
         let gradeClass = "miss";
-        if (distanceKm <= 80) gradeClass = "perfect";
-        else if (distanceKm <= 180) gradeClass = "good";
-        else if (distanceKm <= 350) gradeClass = "close";
+        if (distanceKm <= 150) gradeClass = "perfect";
+        else if (distanceKm <= 350) gradeClass = "good";
+        else if (distanceKm <= 500) gradeClass = "close";
+        else if (distanceKm <= 800) gradeClass = "far";
         msgDiv.className = `message ${gradeClass}`;
         msgDiv.innerHTML = `${getGradeText(distanceKm)}`;
         showMarkers = true;
